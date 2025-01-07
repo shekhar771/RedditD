@@ -10,14 +10,14 @@ type Props = {};
 
 const Navbar = (props: Props) => {
   return (
-    <nav className="flex h-[10vh] w-full items-center border-b px-7 mx-2 md:justify-between px-14">
+    <nav className="flex h-[10vh] w-full items-center border-b px-7 mx-2 md:justify-between px-14 mb-3">
       <Link href="/">
         <Image src={reddie} alt="reddit logo" className="  h-14 w-full" />
       </Link>
       <div className="flex items-center gap-x-2">
         <ModeToggle />
-        <Button variant={"secondary"}>sign in</Button>
-        <Button>sign up</Button>
+        <Button variant={"secondary"}>sign up</Button>
+        <Button>sign in</Button>
       </div>
     </nav>
   );
