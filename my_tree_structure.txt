@@ -1,0 +1,66 @@
+.
+
+├── public
+├── src
+│   ├── app
+│   │   ├── (public)
+│   │   │   ├── login
+│   │   │   │   └── page.tsx
+│   │   │   └── signup
+│   │   │       ├── Form.tsx
+│   │   │       └── page.tsx
+│   │   ├── api
+│   │   │   └── auth
+│   │   │       └── [...auth]
+│   │   │           ├── cookie.ts
+│   │   │           ├── password.ts
+│   │   │           ├── route.ts
+│   │   │           └── session.ts
+│   │   ├── components
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── ThemeButton.tsx
+│   │   │   ├── Toaster.tsx
+│   │   │   └── theme-provider.tsx
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components
+│   │   └── ui
+│   │       ├── alert.tsx
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── dropdown-menu.tsx
+│   │       ├── icons.tsx
+│   │       ├── input.tsx
+│   │       ├── label.tsx
+│   │       ├── toast.tsx
+│   │       └── toaster.tsx
+│   ├── hooks
+│   │   └── use-toast.ts
+│   ├── lib
+│   │   ├── auth.ts
+│   │   ├── db.ts
+│   │   └── utils.ts
+│   └── config
+├── prisma
+│   ├── migrations
+│   │   ├── 20250127044348_init
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   └── schema.prisma
+|
+├── README.md
+├── components.json
+├── eslint.config.mjs
+├── my_tree_structure.txt
+├── next-env.d.ts
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── s
+├── tailwind.config.ts
+└── tsconfig.json
+
+18 directories, 52 files

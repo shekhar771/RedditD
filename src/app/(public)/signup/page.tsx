@@ -19,6 +19,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import { signup } from "@/lib/auth";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -42,7 +43,8 @@ export default function SignUpPage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-
+    await signup(formData);
+    alert("Sign up successful!");
     try {
       throw new Error();
       // First register the user (you'll need to implement this API route)

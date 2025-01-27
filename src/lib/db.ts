@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import "server-only";
 
 declare global {
   // eslint-disable-next-line no-var, no-unused-vars
@@ -17,4 +16,3 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export const db = prisma;
-

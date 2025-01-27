@@ -3,23 +3,19 @@ import {
   encodeBase32LowerCaseNoPadding,
   encodeHexLowerCase,
 } from "@oslojs/encoding";
-import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma"; // Prisma client instance
 
+const SESSION_REFRESH_INTERVAL_MS = 1000 * 60 * 60 * 24 * 15; // 15 days
+const SESSION_MAX_DURATION_MS = SESSION_REFRESH_INTERVAL_MS * 2; // 30 days
 
+const fromSessionTokenToSessionId = (sessionToken: string) => {
+  return encodeHexLowerCase(sha256(new TextEncoder().encode(sessionToken)));
+};
 
-  // src/auth/session.ts
 export const generateRandomSessionToken = () => {
   const bytes = new Uint8Array(20);
   crypto.getRandomValues(bytes);
   return encodeBase32LowerCaseNoPadding(bytes);
-};
-
-// src/auth/session.ts
-const SESSION_REFRESH_INTERVAL_MS = 1000 * 60 * 60 * 24 * 15; // 15 days
-const SESSION_MAX_DURATION_MS = SESSION_REFRESH_INTERVAL_MS * 2;  // 30 days
-
-const fromSessionTokenToSessionId = (sessionToken: string) => {
-  return encodeHexLowerCase(sha256(new TextEncoder().encode(sessionToken)));
 };
 
 export const createSession = async (sessionToken: string, userId: string) => {
@@ -31,72 +27,38 @@ export const createSession = async (sessionToken: string, userId: string) => {
     expiresAt: new Date(Date.now() + SESSION_MAX_DURATION_MS),
   };
 
-  // or your ORM of choice
-  await prisma.session.create({
-    data: session,
-  });
-
+  await prisma.session.create({ data: session });
   return session;
 };
-
-
 
 export const validateSession = async (sessionToken: string) => {
   const sessionId = fromSessionTokenToSessionId(sessionToken);
 
-  // or your ORM of choice
   const result = await prisma.session.findUnique({
-    where: {
-      id: sessionId,
-    },
-    include: {
-      user: true,
-    },
+    where: { id: sessionId },
+    include: { user: true },
   });
 
-  // if there is no session, return null
-  if (!result) {
-    return { session: null, user: null };
-  }
+  if (!result) return { session: null, user: null };
 
   const { user, ...session } = result;
 
-  // if the session is expired, delete it
   if (Date.now() >= session.expiresAt.getTime()) {
-    // or your ORM of choice
-    await prisma.session.delete({
-      where: {
-        id: sessionId,
-      },
-    });
-
+    await prisma.session.delete({ where: { id: sessionId } });
     return { session: null, user: null };
   }
 
-  // if 15 days are left until the session expires, refresh the session
   if (Date.now() >= session.expiresAt.getTime() - SESSION_REFRESH_INTERVAL_MS) {
     session.expiresAt = new Date(Date.now() + SESSION_MAX_DURATION_MS);
-
-    // or your ORM of choice
     await prisma.session.update({
-      where: {
-        id: sessionId,
-      },
-      data: {
-        expiresAt: session.expiresAt,
-      },
+      where: { id: sessionId },
+      data: { expiresAt: session.expiresAt },
     });
   }
 
   return { session, user };
 };
 
-
 export const invalidateSession = async (sessionId: string) => {
-  // or your ORM of choice
-  await prisma.session.delete({
-    where: {
-      id: sessionId,
-    },
-  });
+  await prisma.session.delete({ where: { id: sessionId } });
 };

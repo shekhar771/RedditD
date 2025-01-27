@@ -28,3 +28,47 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 };
+
+export const signup = async (formData: {
+  username: string;
+  email: string;
+  password: string;
+}) => {
+  const response = await fetch("/api/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to sign up");
+  }
+
+  return await response.json(); // Returns user data
+};
+
+export const signin = async (formData: { email: string; password: string }) => {
+  const response = await fetch("/api/auth/signin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to sign in");
+  }
+
+  return await response.json(); // Returns user data
+};
+
+export const signout = async () => {
+  const response = await fetch("/api/auth/signout", {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to sign out");
+  }
+};

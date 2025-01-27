@@ -1,9 +1,12 @@
 import { cookies } from "next/headers";
-// or your framework's cookie API
+import { validateSession } from "./session";
 
 export const SESSION_COOKIE_NAME = "session";
 
-export const setSessionCookie = async (sessionToken: string, expiresAt: Date) => {
+export const setSessionCookie = async (
+  sessionToken: string,
+  expiresAt: Date
+) => {
   const cookie = {
     name: SESSION_COOKIE_NAME,
     value: sessionToken,
@@ -15,9 +18,7 @@ export const setSessionCookie = async (sessionToken: string, expiresAt: Date) =>
       expires: expiresAt,
     },
   };
-
   (await cookies()).set(cookie.name, cookie.value, cookie.attributes);
-  // or your framework's cookie API
 };
 
 export const deleteSessionCookie = async () => {
@@ -32,35 +33,12 @@ export const deleteSessionCookie = async () => {
       maxAge: 0,
     },
   };
-
   (await cookies()).set(cookie.name, cookie.value, cookie.attributes);
-  // or your framework's cookie API
 };
 
-
-// src/auth/cookie.ts
-export const getAuth = () => {
-    const sessionToken =
-      (await cookies()).get(SESSION_COOKIE_NAME)?.value ?? null;
-    // or your framework's cookie API
-  
-    if (!sessionToken) {
-      return { session: null, user: null };
-    }
-  
-    return validateSession(sessionToken);
-  };
-
-
-  // src/auth/cookie.ts
-export const getAuth = () => {
+export const getAuth = async () => {
   const sessionToken =
     (await cookies()).get(SESSION_COOKIE_NAME)?.value ?? null;
-  // or your framework's cookie API
-
-  if (!sessionToken) {
-    return { session: null, user: null };
-  }
-
+  if (!sessionToken) return { session: null, user: null };
   return validateSession(sessionToken);
 };
