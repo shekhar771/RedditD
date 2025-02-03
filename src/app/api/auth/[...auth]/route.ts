@@ -12,6 +12,15 @@ import { cookies } from "next/headers";
 // Handle POST request for signup
 
 export async function POST(req: Request) {
+  const headers = new Headers();
+  headers.set("Access-Control-Allow-Origin", "*"); // Allow all origins (or specify your frontend URL)
+  headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle preflight OPTIONS request
+  if (req.method === "OPTIONS") {
+    return new NextResponse(null, { headers });
+  }
   try {
     // Parse the request body
     const body = await req.json();
@@ -54,7 +63,11 @@ export async function POST(req: Request) {
 
     // Create a session for the user
     const sessionToken = generateRandomSessionToken();
+    // const id = "aaa";
+    // const user = { id: id, username: "aa", email: "a", password: "aa" };
+    console.log(sessionToken);
     const session = await createSession(sessionToken, user.id);
+    console.log(session);
 
     // Create response with user data
     const response = NextResponse.json(
@@ -74,15 +87,8 @@ export async function POST(req: Request) {
     return response;
   } catch (error) {
     console.error("Signup error:", error);
-
-    // Ensure a proper error response
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to create user. Please try again.",
-      },
+      { error: error instanceof Error ? error.message : "Registration failed" },
       { status: 500 }
     );
   }

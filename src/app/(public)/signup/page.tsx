@@ -212,27 +212,3 @@ export default function SignUpPage() {
     </div>
   );
 }
-
-// {const res = await fetch("/api/auth/register", {
-//   method: "POST",
-//   headers: { "Content-Type": "application/json" },
-//   body: JSON.stringify(formData),
-// });
-
-// if (!res.ok) {
-//   throw new Error(await res.text());
-// }
-
-// // If registration successful, sign them in
-// const result = await signIn("credentials", {
-//   email: formData.email,
-//   password: formData.password,
-//   redirect: false,
-// });
-
-// if (result?.error) {
-//   setError(result.error);
-// } else {
-//   router.push("/dashboard");
-//   router.refresh();
-// }}

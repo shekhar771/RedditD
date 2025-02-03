@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 export const SESSION_COOKIE_NAME = "session";
 
@@ -28,7 +29,7 @@ export const deleteSessionCookie = async (response?: NextResponse) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/",
-    maxAge: 0,
+    // maxAge: 0,
   };
 
   if (response) {
