@@ -1,11 +1,11 @@
 import { NextAuthOptions } from "next-auth";
-import { db } from "./db";
+import { prisma } from "./db";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import GitHubProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(prisma),
   pages: { signIn: "/signin" },
   session: {
     strategy: "jwt",

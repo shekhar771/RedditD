@@ -1,44 +1,43 @@
 import { cookies } from "next/headers";
-import { validateSession } from "./session";
 
 export const SESSION_COOKIE_NAME = "session";
 
 export const setSessionCookie = async (
   sessionToken: string,
-  expiresAt: Date
+  expiresAt: Date,
+  response?: NextResponse
 ) => {
-  const cookie = {
-    name: SESSION_COOKIE_NAME,
-    value: sessionToken,
-    attributes: {
-      httpOnly: true,
-      sameSite: "lax" as const,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      expires: expiresAt,
-    },
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    expires: expiresAt,
   };
-  (await cookies()).set(cookie.name, cookie.value, cookie.attributes);
+
+  if (response) {
+    response.cookies.set(SESSION_COOKIE_NAME, sessionToken, cookieOptions);
+  } else {
+    (await cookies()).set(SESSION_COOKIE_NAME, sessionToken, cookieOptions);
+  }
 };
 
-export const deleteSessionCookie = async () => {
-  const cookie = {
-    name: SESSION_COOKIE_NAME,
-    value: "",
-    attributes: {
-      httpOnly: true,
-      sameSite: "lax" as const,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 0,
-    },
+export const deleteSessionCookie = async (response?: NextResponse) => {
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: 0,
   };
-  (await cookies()).set(cookie.name, cookie.value, cookie.attributes);
+
+  if (response) {
+    response.cookies.set(SESSION_COOKIE_NAME, "", cookieOptions);
+  } else {
+    (await cookies()).set(SESSION_COOKIE_NAME, "", cookieOptions);
+  }
 };
 
-export const getAuth = async () => {
-  const sessionToken =
-    (await cookies()).get(SESSION_COOKIE_NAME)?.value ?? null;
-  if (!sessionToken) return { session: null, user: null };
-  return validateSession(sessionToken);
+export const getSessionToken = async () => {
+  return (await cookies()).get(SESSION_COOKIE_NAME)?.value;
 };

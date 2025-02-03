@@ -1,6 +1,20 @@
 .
-
+├── prisma
+│   ├── migrations
+│   │   ├── 20250120092838_init
+│   │   │   └── migration.sql
+│   │   ├── 20250127044348_init
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   └── schema.prisma
 ├── public
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── reddie-logo.svg
+│   ├── reddie-logo1.png
+│   ├── vercel.svg
+│   └── window.svg
 ├── src
 │   ├── app
 │   │   ├── (public)
@@ -8,14 +22,18 @@
 │   │   │   │   └── page.tsx
 │   │   │   └── signup
 │   │   │       ├── Form.tsx
-│   │   │       └── page.tsx
+│   │   │       ├── page.tsx
+│   │   │       └── signout.ts
 │   │   ├── api
 │   │   │   └── auth
-│   │   │       └── [...auth]
-│   │   │           ├── cookie.ts
-│   │   │           ├── password.ts
-│   │   │           ├── route.ts
-│   │   │           └── session.ts
+│   │   │       ├── [...auth]
+│   │   │       │   ├── cookie.ts
+│   │   │       │   ├── password.ts
+│   │   │       │   ├── route.ts
+│   │   │       │   ├── session.ts
+│   │   │       │   ├── signin.ts
+│   │   │       │   └── signup.ts
+│   │   │       └── asa.ts
 │   │   ├── components
 │   │   │   ├── Navbar.tsx
 │   │   │   ├── ThemeButton.tsx
@@ -43,13 +61,6 @@
 │   │   ├── db.ts
 │   │   └── utils.ts
 │   └── config
-├── prisma
-│   ├── migrations
-│   │   ├── 20250127044348_init
-│   │   │   └── migration.sql
-│   │   └── migration_lock.toml
-│   └── schema.prisma
-|
 ├── README.md
 ├── components.json
 ├── eslint.config.mjs
@@ -63,4 +74,4 @@
 ├── tailwind.config.ts
 └── tsconfig.json
 
-18 directories, 52 files
+18 directories, 56 files

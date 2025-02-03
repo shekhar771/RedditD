@@ -39,23 +39,45 @@ export default function SignUpPage() {
     }));
   };
 
+  // src/app/(public)/signup/page.tsx
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    await signup(formData);
-    alert("Sign up successful!");
+
     try {
-      throw new Error();
-      // First register the user (you'll need to implement this API route)
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      // Validate input
+      if (!formData.email || !formData.password || !formData.username) {
+        setError("Please fill in all fields.");
+        return;
+      }
+
+      // Attempt signup
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-      //toaster
+
+      // Parse the response
+      const data = await response.json();
+
+      // Check if the request was successful
+      if (!response.ok) {
+        // Throw an error with the backend's error message
+        throw new Error(data.error || "Failed to sign up");
+      }
+
+      // Signup successful
+      toast({
+        title: "Account Created",
+        description: "Your account has been successfully created.",
+      });
+
+      // Optionally redirect or sign in
+      // router.push("/dashboard");
+    } catch (error) {
+      // Set the error state with the error message
       setError(error instanceof Error ? error.message : "Something went wrong");
     } finally {
       setIsLoading(false);

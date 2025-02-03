@@ -16,8 +16,13 @@ const Navbar = (props: Props) => {
       </Link>
       <div className="flex items-center gap-x-2">
         <ModeToggle />
-        <Button variant={"secondary"}>sign up</Button>
-        <Button>sign in</Button>
+        <Button variant="secondary" asChild>
+          <Link href="/signup">Sign Up</Link>
+        </Button>
+
+        <Button asChild>
+          <Link href="/login">Sign In</Link>
+        </Button>
       </div>
     </nav>
   );

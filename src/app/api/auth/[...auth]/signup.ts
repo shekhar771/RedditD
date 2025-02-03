@@ -1,26 +1,41 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/lib/prisma";
-import { hashPassword } from "@/auth/password";
-import { generateRandomSessionToken, createSession } from "@/auth/session";
-import { setSessionCookie } from "@/auth/cookie";
+// src/app/api/auth/signup/route.ts
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { hashPassword } from "./password";
+import {
+  generateRandomSessionToken,
+  createSession,
+} from "@/app/api/auth/[...auth]/session";
+import { setSessionCookie } from "@/app/api/auth/[...auth]/cookie";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") return res.status(405).end();
+export async function POST(req: Request) {
+  const body = await req.json();
+  const { username, email, password } = body;
 
-  const { username, email, password } = req.body;
+  // Validate the request body
+  if (!body || typeof body !== "object") {
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 }
+    );
+  }
+  try {
+    const passwordHash = await hashPassword(password);
+    const user = await prisma.user.create({
+      data: { username, email, passwordHash },
+    });
 
-  const passwordHash = await hashPassword(password);
-  const user = await prisma.user.create({
-    data: { username, email, passwordHash },
-  });
+    const sessionToken = generateRandomSessionToken();
+    const session = await createSession(sessionToken, user.id);
 
-  const sessionToken = generateRandomSessionToken();
-  const session = await createSession(sessionToken, user.id);
+    const response = NextResponse.json({ user }, { status: 201 });
+    await setSessionCookie(sessionToken, session.expiresAt, response);
 
-  await setSessionCookie(sessionToken, session.expiresAt);
-
-  res.status(201).json({ user });
+    return response;
+  } catch (error) {
+    return NextResponse.json(
+      { error: `failed to create user ${error}` },
+      { status: 500 }
+    );
+  }
 }
