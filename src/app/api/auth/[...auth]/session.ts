@@ -25,7 +25,8 @@ export const createSession = async (sessionToken: string, userId: string) => {
   const session = {
     id: sessionId,
     userId,
-    expiresAt: new Date(Date.now() + SESSION_MAX_DURATION_MS),
+    sessionToken,
+    expires: new Date(Date.now() + SESSION_MAX_DURATION_MS), // Change expiresAt to expires
   };
 
   await prisma.session.create({ data: session });
@@ -44,16 +45,16 @@ export const validateSession = async (sessionToken: string) => {
 
   const { user, ...session } = result;
 
-  if (Date.now() >= session.expiresAt.getTime()) {
+  if (Date.now() >= session.expires.getTime()) {
     await prisma.session.delete({ where: { id: sessionId } });
     return { session: null, user: null };
   }
 
-  if (Date.now() >= session.expiresAt.getTime() - SESSION_REFRESH_INTERVAL_MS) {
-    session.expiresAt = new Date(Date.now() + SESSION_MAX_DURATION_MS);
+  if (Date.now() >= session.expires.getTime() - SESSION_REFRESH_INTERVAL_MS) {
+    session.expires = new Date(Date.now() + SESSION_MAX_DURATION_MS);
     await prisma.session.update({
       where: { id: sessionId },
-      data: { expiresAt: session.expiresAt },
+      data: { expires: session.expires },
     });
   }
 

@@ -82,7 +82,7 @@ export async function POST(req: Request) {
     );
 
     // Set the session cookie
-    await setSessionCookie(sessionToken, session.expiresAt, response);
+    await setSessionCookie(sessionToken, session.expires, response);
 
     return response;
   } catch (error) {
@@ -122,7 +122,7 @@ export async function PUT(req: Request) {
 
     // Set the session cookie
     const response = NextResponse.json({ user }, { status: 200 });
-    await setSessionCookie(sessionToken, session.expiresAt, response);
+    await setSessionCookie(sessionToken, session.expires, response);
 
     return response;
   } catch (error) {

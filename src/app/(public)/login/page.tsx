@@ -44,8 +44,9 @@ export default function SignInPage() {
         title: "Success",
         description: "Logged in successfully",
       });
+      console.log(data);
 
-      router.push("/dashboard");
+      //
       router.refresh();
     } catch (error) {
       toast({
