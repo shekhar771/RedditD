@@ -73,6 +73,8 @@ export default function SignUpPage() {
         title: "Account Created",
         description: "Your account has been successfully created.",
       });
+      router.push("/dashboard");
+
       console.log(data);
       // Optionally redirect or sign in
     } catch (error) {
