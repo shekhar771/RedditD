@@ -5,6 +5,8 @@
 │   │   │   └── migration.sql
 │   │   ├── 20250127044348_init
 │   │   │   └── migration.sql
+│   │   ├── 20250131132005_add_username
+│   │   │   └── migration.sql
 │   │   └── migration_lock.toml
 │   └── schema.prisma
 ├── public
@@ -18,6 +20,8 @@
 ├── src
 │   ├── app
 │   │   ├── (public)
+│   │   │   ├── dashboard
+│   │   │   │   └── page.tsx
 │   │   │   ├── login
 │   │   │   │   └── page.tsx
 │   │   │   └── signup
@@ -27,6 +31,8 @@
 │   │   ├── api
 │   │   │   └── auth
 │   │   │       ├── [...auth]
+│   │   │       │   ├── signin
+│   │   │       │   ├── aa
 │   │   │       │   ├── cookie.ts
 │   │   │       │   ├── password.ts
 │   │   │       │   ├── route.ts
@@ -35,6 +41,7 @@
 │   │   │       │   └── signup.ts
 │   │   │       └── asa.ts
 │   │   ├── components
+│   │   │   ├── AuthProvider.tsx
 │   │   │   ├── Navbar.tsx
 │   │   │   ├── ThemeButton.tsx
 │   │   │   ├── Toaster.tsx
@@ -74,4 +81,4 @@
 ├── tailwind.config.ts
 └── tsconfig.json
 
-18 directories, 56 files
+21 directories, 60 files

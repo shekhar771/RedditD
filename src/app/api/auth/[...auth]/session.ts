@@ -64,3 +64,35 @@ export const validateSession = async (sessionToken: string) => {
 export const invalidateSession = async (sessionId: string) => {
   await prisma.session.delete({ where: { id: sessionId } });
 };
+
+
+
+export async function GET(req: NextRequest) {
+  try {
+    const sessionToken = cookies().get("session")?.value;
+
+    if (!sessionToken) {
+      return NextResponse.json({ error: "No session found" }, { status: 401 });
+    }
+
+    const { session, user } = await validateSession(sessionToken);
+
+    if (!session || !user) {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    }
+
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Session validation error:", error);
+    return NextResponse.json(
+      { error: "Session validation failed" },
+      { status: 500 }
+    );
+  }
+}

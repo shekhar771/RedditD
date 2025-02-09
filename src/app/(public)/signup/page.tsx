@@ -19,9 +19,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { signup } from "@/lib/auth";
+import { useAuth } from "@/app/components/AuthProvider";
 
 export default function SignUpPage() {
+  const { signup } = useAuth();
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,34 +53,12 @@ export default function SignUpPage() {
         setError("Please fill in all fields.");
         return;
       }
-
-      // Attempt signup
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      // Parse the response
-      const data = await response.json();
-
-      // Check if the request was successful
-      if (!response.ok) {
-        // Throw an error with the backend's error message
-        throw new Error(data.error || "Failed to sign up");
-      }
-
-      // Signup successful
+      await signup(formData.email, formData.password, formData.username);
       toast({
         title: "Account Created",
         description: "Your account has been successfully created.",
       });
-      router.push("/dashboard");
-
-      console.log(data);
-      // Optionally redirect or sign in
     } catch (error) {
-      // Set the error state with the error message
       setError(error instanceof Error ? error.message : "Something went wrong");
     } finally {
       setIsLoading(false);

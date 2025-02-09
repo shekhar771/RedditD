@@ -9,6 +9,9 @@ import {
 import { setSessionCookie, deleteSessionCookie } from "./cookie";
 import { cookies } from "next/headers";
 
+
+
+
 // Handle POST request for signup
 
 export async function POST(req: Request) {
@@ -93,6 +96,8 @@ export async function POST(req: Request) {
     );
   }
 }
+
+
 
 // Handle PUT request for signin
 export async function PUT(req: Request) {
