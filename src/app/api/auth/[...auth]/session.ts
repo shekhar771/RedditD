@@ -1,5 +1,5 @@
 import { sha256 } from "@oslojs/crypto/sha2";
-import { webcrypto as crypto } from "crypto"; // Add this import
+// import { webcrypto as crypto } from "crypto"; // Add this import
 import { prisma } from "@/lib/db"; // Prisma client instance
 import {
   encodeBase32LowerCaseNoPadding,
@@ -12,6 +12,7 @@ const SESSION_MAX_DURATION_MS = SESSION_REFRESH_INTERVAL_MS * 2; // 30 days
 const fromSessionTokenToSessionId = (sessionToken: string) => {
   return encodeHexLowerCase(sha256(new TextEncoder().encode(sessionToken)));
 };
+const crypto = globalThis.crypto;
 
 export const generateRandomSessionToken = () => {
   const bytes = new Uint8Array(20);
