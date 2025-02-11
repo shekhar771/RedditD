@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import { ThemeProvider } from "@/app/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-provider;
+import { AuthProvider } from "./components/AuthProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      ><AuthProvider>
         {" "}
         <ThemeProvider
           attribute="class"
@@ -40,7 +40,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Toaster />
-        </ThemeProvider>
+        </ThemeProvider></AuthProvider>
       </body>
     </html>
   );
