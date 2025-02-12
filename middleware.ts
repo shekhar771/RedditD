@@ -2,17 +2,27 @@ import { validateSession } from "@/app/api/auth/[...auth]/session";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-
 // Define public routes that don't require authentication
-const publicRoutes = ["/login", "/signup", "/"];
+const publicRoutes = [
+  "/login",
+  "/signup",
+  "/",
+  "/forgot-password",
+  "reset-password",
+];
 
 export async function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get("session")?.value;
   const { pathname } = request.nextUrl;
 
+  // Check if the current path is public
+  const isPublicRoute = publicRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+
   // Allow public routes without authentication
-  if (publicRoutes.includes(pathname)) {
-    // If user is already authenticated, redirect to dashboard from login/signup
+  if (isPublicRoute) {
+    // If user is already authenticated, redirect to dashboard from auth pages
     if (sessionToken && (pathname === "/login" || pathname === "/signup")) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
@@ -28,7 +38,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     const { session, user } = await validateSession(sessionToken);
-    
+
     if (!session || !user) {
       const redirectUrl = new URL("/login", request.url);
       redirectUrl.searchParams.set("from", pathname);

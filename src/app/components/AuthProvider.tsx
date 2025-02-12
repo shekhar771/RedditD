@@ -1,6 +1,6 @@
-"use client"
+"use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 interface User {
   id: string;
@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Session refresh failed:", error);
       setUser(null);
       return null;
+      router.push("/login");
     } finally {
       setIsLoading(false);
     }

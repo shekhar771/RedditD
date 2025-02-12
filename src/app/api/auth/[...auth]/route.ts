@@ -6,11 +6,12 @@ import {
   createSession,
   invalidateSession,
 } from "./session";
-import { setSessionCookie, deleteSessionCookie } from "./cookie";
+import {
+  setSessionCookie,
+  deleteSessionCookie,
+  SESSION_COOKIE_NAME,
+} from "./cookie";
 import { cookies } from "next/headers";
-
-
-
 
 // Handle POST request for signup
 
@@ -97,8 +98,6 @@ export async function POST(req: Request) {
   }
 }
 
-
-
 // Handle PUT request for signin
 export async function PUT(req: Request) {
   try {
@@ -142,8 +141,9 @@ export async function PUT(req: Request) {
 // Handle DELETE request for signout
 export async function DELETE(req: Request) {
   try {
+    const cookiestore = cookies();
+    const sessionToken = (await cookiestore).get(SESSION_COOKIE_NAME)?.value;
     // Get the session token from the cookie
-    const sessionToken = (await cookies()).get("session")?.value;
     if (!sessionToken) {
       return NextResponse.json({ error: "No session found" }, { status: 400 });
     }
@@ -156,9 +156,7 @@ export async function DELETE(req: Request) {
       { message: "Signed out successfully" },
       { status: 200 }
     );
-    await deleteSessionCookie(response);
-
-    return response;
+    return await deleteSessionCookie(response);
   } catch (error) {
     console.error("Signout error:", error);
     return NextResponse.json(
