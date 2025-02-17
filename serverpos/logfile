@@ -1,0 +1,47 @@
+2025-02-17 15:48:59.896 IST [22632] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-02-17 15:48:59.956 IST [22632] LOG:  listening on IPv6 address "::1", port 5432
+2025-02-17 15:48:59.956 IST [22632] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-02-17 15:49:00.198 IST [332] LOG:  database system was interrupted; last known up at 2025-02-13 17:29:42 IST
+2025-02-17 15:49:06.930 IST [332] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-02-17 15:49:06.947 IST [332] LOG:  redo starts at 0/3EB7EE8
+2025-02-17 15:49:06.947 IST [332] LOG:  invalid record length at 0/3EB7FF0: expected at least 24, got 0
+2025-02-17 15:49:06.947 IST [332] LOG:  redo done at 0/3EB7FB8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-02-17 15:49:06.962 IST [15000] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-02-17 15:49:07.015 IST [15000] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.019 s, sync=0.012 s, total=0.060 s; sync files=2, longest=0.007 s, average=0.006 s; distance=0 kB, estimate=0 kB; lsn=0/3EB7FF0, redo lsn=0/3EB7FF0
+2025-02-17 15:49:07.080 IST [22632] LOG:  database system is ready to accept connections
+2025-02-17 16:14:06.989 IST [15000] LOG:  checkpoint starting: time
+2025-02-17 16:14:07.592 IST [15000] LOG:  checkpoint complete: wrote 6 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.559 s, sync=0.010 s, total=0.604 s; sync files=6, longest=0.006 s, average=0.002 s; distance=3 kB, estimate=3 kB; lsn=0/3EB8F60, redo lsn=0/3EB8F08
+2025-02-17 16:19:06.614 IST [15000] LOG:  checkpoint starting: time
+2025-02-17 16:19:07.204 IST [15000] LOG:  checkpoint complete: wrote 6 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.550 s, sync=0.011 s, total=0.590 s; sync files=6, longest=0.006 s, average=0.002 s; distance=4 kB, estimate=4 kB; lsn=0/3EBA038, redo lsn=0/3EB9FC8
+2025-02-17 16:20:46.984 IST [22632] LOG:  received fast shutdown request
+2025-02-17 16:20:46.993 IST [22632] LOG:  aborting any active transactions
+2025-02-17 16:20:46.993 IST [19280] ERROR:  canceling statement due to user request
+2025-02-17 16:20:47.003 IST [20772] FATAL:  terminating connection due to administrator command
+2025-02-17 16:20:47.014 IST [22632] LOG:  background worker "logical replication launcher" (PID 19280) exited with exit code 1
+2025-02-17 16:20:47.020 IST [15000] LOG:  shutting down
+2025-02-17 16:20:47.028 IST [15000] LOG:  checkpoint starting: shutdown immediate
+2025-02-17 16:20:47.063 IST [15000] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.001 s, total=0.043 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=3 kB; lsn=0/3EBA0E8, redo lsn=0/3EBA0E8
+2025-02-17 16:20:47.089 IST [22632] LOG:  database system is shut down
+2025-02-17 16:22:02.480 IST [23400] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-02-17 16:22:02.498 IST [23400] LOG:  listening on IPv6 address "::1", port 5432
+2025-02-17 16:22:02.498 IST [23400] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-02-17 16:22:02.884 IST [19696] LOG:  database system was shut down at 2025-02-17 16:20:47 IST
+2025-02-17 16:22:02.991 IST [23400] LOG:  database system is ready to accept connections
+2025-02-17 16:23:23.230 IST [23400] LOG:  received fast shutdown request
+2025-02-17 16:23:23.236 IST [3944] ERROR:  canceling statement due to user request
+2025-02-17 16:23:23.238 IST [23400] LOG:  aborting any active transactions
+2025-02-17 16:23:23.247 IST [23400] LOG:  background worker "logical replication launcher" (PID 3944) exited with exit code 1
+2025-02-17 16:23:23.270 IST [24236] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-02-17 16:23:23.270 IST [24236] FATAL:  terminating connection due to administrator command
+2025-02-17 16:23:23.270 IST [24236] LOG:  could not send data to client: An existing connection was forcibly closed by the remote host.
+	
+2025-02-17 16:23:23.283 IST [22780] LOG:  shutting down
+2025-02-17 16:23:23.291 IST [22780] LOG:  checkpoint starting: shutdown immediate
+2025-02-17 16:23:23.382 IST [22780] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.042 s, sync=0.020 s, total=0.099 s; sync files=7, longest=0.009 s, average=0.003 s; distance=5 kB, estimate=5 kB; lsn=0/3EBB528, redo lsn=0/3EBB528
+2025-02-17 16:23:23.409 IST [23400] LOG:  database system is shut down
+2025-02-17 16:25:18.414 IST [23428] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-02-17 16:25:18.421 IST [23428] LOG:  listening on IPv6 address "::1", port 5432
+2025-02-17 16:25:18.422 IST [23428] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-02-17 16:25:18.634 IST [3452] LOG:  database system was shut down at 2025-02-17 16:23:23 IST
+2025-02-17 16:25:18.712 IST [23428] LOG:  database system is ready to accept connections

@@ -1,3 +1,3 @@
 @echo off
-echo Starting PostgreSQL...
-pg_ctl -D "C:\Users\Shekhar1.Gupta\PostgreSQL\pgsql\data" start
+"C:\Users\Shekhar1.Gupta\PostgreSQL\pgsql\bin\pg_ctl.exe" -D "C:\Users\Shekhar1.Gupta\PostgreSQL\pgsql\data" -l logfile start
+
