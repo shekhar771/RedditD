@@ -45,3 +45,13 @@
 2025-02-17 16:25:18.422 IST [23428] LOG:  listening on IPv4 address "127.0.0.1", port 5432
 2025-02-17 16:25:18.634 IST [3452] LOG:  database system was shut down at 2025-02-17 16:23:23 IST
 2025-02-17 16:25:18.712 IST [23428] LOG:  database system is ready to accept connections
+2025-02-17 16:30:18.507 IST [2420] LOG:  checkpoint starting: time
+2025-02-17 16:30:18.684 IST [2420] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.136 s, sync=0.017 s, total=0.181 s; sync files=3, longest=0.010 s, average=0.006 s; distance=0 kB, estimate=0 kB; lsn=0/3EBB630, redo lsn=0/3EBB5D8
+2025-02-17 16:45:18.705 IST [2420] LOG:  checkpoint starting: time
+2025-02-17 16:45:18.972 IST [2420] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.228 s, sync=0.014 s, total=0.268 s; sync files=3, longest=0.007 s, average=0.005 s; distance=2 kB, estimate=2 kB; lsn=0/3EBBEF8, redo lsn=0/3EBBEA0
+2025-02-17 16:50:18.983 IST [2420] LOG:  checkpoint starting: time
+2025-02-17 16:50:19.559 IST [2420] LOG:  checkpoint complete: wrote 6 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.546 s, sync=0.009 s, total=0.577 s; sync files=6, longest=0.006 s, average=0.002 s; distance=5 kB, estimate=5 kB; lsn=0/3EBD3C8, redo lsn=0/3EBD370
+2025-02-17 16:55:18.589 IST [2420] LOG:  checkpoint starting: time
+2025-02-17 16:55:19.181 IST [2420] LOG:  checkpoint complete: wrote 6 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.558 s, sync=0.008 s, total=0.592 s; sync files=6, longest=0.005 s, average=0.002 s; distance=5 kB, estimate=5 kB; lsn=0/3EBEA80, redo lsn=0/3EBEA28
+2025-02-17 17:10:18.180 IST [2420] LOG:  checkpoint starting: time
+2025-02-17 17:10:18.770 IST [2420] LOG:  checkpoint complete: wrote 6 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.554 s, sync=0.011 s, total=0.590 s; sync files=6, longest=0.007 s, average=0.002 s; distance=6 kB, estimate=6 kB; lsn=0/3EC0280, redo lsn=0/3EC0228

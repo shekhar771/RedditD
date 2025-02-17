@@ -15,6 +15,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
+  loginWithGithub: () => Promise<void>; // Add this new method
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -114,10 +115,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
   };
+  const loginWithGithub = async () => {
+    try {
+      window.location.href = "/api/auth/github";
+    } catch (error) {
+      console.error("GitHub login failed:", error);
+      throw error;
+    }
+  };
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, signup, login, logout, refreshSession }}
+      value={{
+        user,
+        isLoading,
+        loginWithGithub,
+        signup,
+        login,
+        logout,
+        refreshSession,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -24,7 +24,7 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { login, loginWithGithub } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +50,17 @@ export default function SignInPage() {
       setIsLoading(false);
     }
   };
-
+  const handleGithubLogin = async () => {
+    try {
+      await loginWithGithub();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "GitHub login failed. Please try again.",
+      });
+    }
+  };
   const handleSocialAuth = async (provider: string) => {
     setIsLoading(true);
     try {
@@ -73,7 +83,7 @@ export default function SignInPage() {
       <div className="grid w-full grow items-center px-4 sm:justify-center">
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle>Sign in to Acme Co</CardTitle>
+            <CardTitle>Sign in to Reddie</CardTitle>
             <CardDescription>
               Welcome back! Please sign in to continue
             </CardDescription>
@@ -83,7 +93,7 @@ export default function SignInPage() {
               <Button
                 variant="outline"
                 disabled={isLoading}
-                onClick={() => handleSocialAuth("github")}
+                onClick={() => handleGithubLogin()}
               >
                 {isLoading ? (
                   <IconSpinner className="h-4 w-4 animate-spin" />
