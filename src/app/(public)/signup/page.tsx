@@ -23,7 +23,7 @@ import { useAuth } from "@/app/components/AuthProvider";
 import { AuthGuard } from "@/app/components/AuthGuard";
 
 export default function SignUpPage() {
-  const { signup } = useAuth();
+  const { loginWithGithub, signup } = useAuth();
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -41,7 +41,17 @@ export default function SignUpPage() {
       [e.target.name]: e.target.value,
     }));
   };
-
+  const handleGithubLogin = async () => {
+    try {
+      await loginWithGithub();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "GitHub login failed. Please try again.",
+      });
+    }
+  };
   // src/app/(public)/signup/page.tsx
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +110,7 @@ export default function SignUpPage() {
                   variant="outline"
                   type="button"
                   disabled={isLoading}
-                  onClick={() => handleSocialSignIn("github")}
+                  onClick={() => handleGithubLogin()}
                 >
                   {isLoading ? (
                     <Icons.spinner className="size-4 animate-spin" />

@@ -3,5 +3,5 @@ import { GitHub } from "arctic";
 export const github = new GitHub(
   process.env.GITHUB_CLIENT_ID!,
   process.env.GITHUB_CLIENT_SECRET!,
-  null
+  `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/github/callback` // Add the full callback URL
 );
