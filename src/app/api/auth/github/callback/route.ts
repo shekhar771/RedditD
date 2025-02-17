@@ -16,7 +16,6 @@ export async function GET(request: Request): Promise<Response> {
     const state = url.searchParams.get("state");
 
     if (!code || !state) {
-      console.error("Missing code or state");
       return NextResponse.redirect(
         new URL("/login?error=missing_params", request.url)
       );
@@ -26,7 +25,6 @@ export async function GET(request: Request): Promise<Response> {
     const storedState = cookieStore.get("github_oauth_state")?.value;
 
     if (!storedState || state !== storedState) {
-      console.error("State mismatch");
       return NextResponse.redirect(
         new URL("/login?error=state_mismatch", request.url)
       );
@@ -34,12 +32,9 @@ export async function GET(request: Request): Promise<Response> {
 
     // Get the tokens from GitHub
     const tokens = await github.validateAuthorizationCode(code);
-
-    // Extract the access token from the nested structure
     const accessToken = tokens.data.access_token;
 
     if (!accessToken) {
-      console.error("No access token received");
       return NextResponse.redirect(
         new URL("/login?error=no_token", request.url)
       );
@@ -55,7 +50,6 @@ export async function GET(request: Request): Promise<Response> {
     });
 
     if (!githubUserResponse.ok) {
-      console.error("GitHub API error:", await githubUserResponse.text());
       return NextResponse.redirect(
         new URL("/login?error=github_api", request.url)
       );
@@ -72,19 +66,10 @@ export async function GET(request: Request): Promise<Response> {
       },
     });
 
-    if (!emailsResponse.ok) {
-      console.error("GitHub emails API error:", await emailsResponse.text());
-      return NextResponse.redirect(
-        new URL("/login?error=github_email", request.url)
-      );
-    }
-
     const emails = await emailsResponse.json();
-    const primaryEmail =
-      emails.find((email: any) => email.primary)?.email || githubUser.email;
+    const primaryEmail = emails.find((email: any) => email.primary);
 
     if (!primaryEmail) {
-      console.error("No primary email found");
       return NextResponse.redirect(
         new URL("/login?error=no_email", request.url)
       );
@@ -93,20 +78,45 @@ export async function GET(request: Request): Promise<Response> {
     // Find or create user
     let user = await prisma.user.findFirst({
       where: {
-        OR: [{ email: primaryEmail }, { username: githubUser.login }],
+        OR: [{ email: primaryEmail.email }, { username: githubUser.login }],
       },
     });
 
     if (!user) {
+      // Create new user
       user = await prisma.user.create({
         data: {
-          email: primaryEmail,
+          email: primaryEmail.email,
           username: githubUser.login,
           name: githubUser.name || githubUser.login,
           image: githubUser.avatar_url,
+          emailVerified: primaryEmail.verified ? new Date() : null,
         },
       });
     }
+
+    // Update or create account
+    await prisma.account.upsert({
+      where: {
+        provider_providerAccountId: {
+          provider: "github",
+          providerAccountId: githubUser.id.toString(),
+        },
+      },
+      create: {
+        userId: user.id,
+        type: "oauth",
+        provider: "github",
+        providerAccountId: githubUser.id.toString(),
+        access_token: accessToken,
+        token_type: "bearer",
+        scope: tokens.data.scope || "",
+      },
+      update: {
+        access_token: accessToken,
+        scope: tokens.data.scope || "",
+      },
+    });
 
     // Create session
     const sessionToken = generateRandomSessionToken();
@@ -121,7 +131,6 @@ export async function GET(request: Request): Promise<Response> {
     return response;
   } catch (error) {
     console.error("GitHub OAuth error:", error);
-    console.error("Full error details:", error);
     return NextResponse.redirect(
       new URL("/login?error=oauth_failed", request.url)
     );
