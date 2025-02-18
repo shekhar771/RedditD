@@ -56,12 +56,16 @@ export async function POST(req: Request) {
         username,
         email,
         passwordHash,
+        name: null,
+        image: null,
       },
       // Explicitly select which fields to return
       select: {
         id: true,
         username: true,
         email: true,
+        name: true,
+        image: true,
       },
     });
 
@@ -125,7 +129,18 @@ export async function PUT(req: Request) {
     const session = await createSession(sessionToken, user.id);
 
     // Set the session cookie
-    const response = NextResponse.json({ user }, { status: 200 });
+    const response = NextResponse.json(
+      {
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          name: user.name || null,
+          image: user.image || null,
+        },
+      },
+      { status: 200 }
+    );
     await setSessionCookie(sessionToken, session.expires, response);
 
     return response;

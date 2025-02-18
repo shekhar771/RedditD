@@ -1,4 +1,3 @@
-schema.prisma
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -56,16 +55,409 @@ email         String?   @unique
   accounts Account[]
   sessions Session[]
 }
-auth.ts
 
+lib/auth.ts 
 import { GitHub } from "arctic";
 
 export const github = new GitHub(
   process.env.GITHUB_CLIENT_ID!,
   process.env.GITHUB_CLIENT_SECRET!,
-  null
+  `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/github/callback` // Add the full callback URL
 );
 
+
+
+component/AuthProvider.tsx 
+"use client";
+import { createContext, useContext, useEffect, useState } from "react";
+import { redirect, useRouter } from "next/navigation";
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  signup: (email: string, password: string, username: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshSession: () => Promise<void>;
+  loginWithGithub: () => Promise<void>; // Add this new method
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  const refreshSession = async () => {
+    try {
+      const response = await fetch("/api/auth/session", {
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        return data.user;
+      } else {
+        setUser(null);
+        return null;
+      }
+    } catch (error) {
+      console.error("Session refresh failed:", error);
+      setUser(null);
+      return null;
+      router.push("/login");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshSession();
+  }, []);
+
+  const signup = async (email: string, password: string, username: string) => {
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password, username }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Signup failed");
+      }
+
+      setUser(data.user);
+      router.push("/dashboard");
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await fetch("/api/auth/signin", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      setUser(data.user);
+      router.push("/dashboard");
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const response = await fetch("/api/auth/signout", {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
+      setUser(null);
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      throw error;
+    }
+  };
+  const loginWithGithub = async () => {
+    try {
+      window.location.href = "/api/auth/github";
+    } catch (error) {
+      console.error("GitHub login failed:", error);
+      throw error;
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        loginWithGithub,
+        signup,
+        login,
+        logout,
+        refreshSession,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
+
+component/AuthGuard.tsx
+"use client";
+
+import { useAuth } from "./AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+}
+export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (requireAuth && !user) {
+        router.push("/login");
+      } else if (!requireAuth && user) {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, isLoading, requireAuth, router]);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Or your loading component
+  }
+
+  if (requireAuth && !user) {
+    return null;
+  }
+
+  if (!requireAuth && user) {
+    return null;
+  }
+
+  return <>{children}</>;
+}
+
+Navbar.tsx
+"use client";
+
+import Link from "next/link";
+import React from "react";
+import reddie from "../../../public/reddie-logo.svg";
+import Image from "next/image";
+import { ModeToggle } from "./ThemeButton";
+import { Button } from "@/components/ui/button";
+type Props = {};
+
+const Navbar = (props: Props) => {
+  return (
+    <nav className="flex h-[10vh] w-full items-center border-b px-7 mx-2 md:justify-between px-14 mb-3">
+      <Link href="/">
+        <Image src={reddie} alt="reddit logo" className="  h-14 w-full" />
+      </Link>
+      <div className="flex items-center gap-x-2">
+        <ModeToggle />
+        <Button variant="secondary" asChild>
+          <Link href="/signup">Sign Up</Link>
+        </Button>
+
+        <Button asChild>
+          <Link href="/login">Sign In</Link>
+        </Button>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+
+
+middleware.ts
+// middleware.ts
+import { validateSession } from "@/app/api/auth/[...auth]/session";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+// Define routes configuration
+const ROUTES = {
+  public: ["/", "/about", "/contact"],
+  auth: ["/login", "/signup", "/forgot-password"],
+  protected: ["/dashboard", "/profile", "/settings"],
+  default: "/dashboard",
+};
+
+export async function middleware(request: NextRequest) {
+  const sessionToken = request.cookies.get("session")?.value;
+  const { pathname } = request.nextUrl;
+
+  // Check if current path matches any route type
+  const isAuthRoute = ROUTES.auth.some((route) => pathname.startsWith(route));
+  const isPublicRoute = ROUTES.public.some((route) =>
+    pathname.startsWith(route)
+  );
+  const isProtectedRoute = ROUTES.protected.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  // Function to validate session and return user data
+  const validateUserSession = async () => {
+    if (!sessionToken) return null;
+    try {
+      const { session, user } = await validateSession(sessionToken);
+      return session && user ? { session, user } : null;
+    } catch (error) {
+      console.error("Session validation error:", error);
+      return null;
+    }
+  };
+
+  // Handle authentication routes (login, signup)
+  if (isAuthRoute) {
+    const userData = await validateUserSession();
+    if (userData) {
+      // Redirect authenticated users away from auth routes
+      return NextResponse.redirect(new URL(ROUTES.default, request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // Handle public routes
+  if (isPublicRoute) {
+    return NextResponse.next();
+  }
+
+  // Handle protected routes
+  if (isProtectedRoute) {
+    const userData = await validateUserSession();
+    if (!userData) {
+      // Redirect unauthenticated users to login
+      const redirectUrl = new URL("/login", request.url);
+      redirectUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // Add user info to headers for API routes
+    const response = NextResponse.next();
+    response.headers.set("x-user-id", userData.user.id);
+    response.headers.set("x-user-email", userData.user.email);
+    return response;
+  }
+
+  // Default handling for unspecified routes
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};
+
+Layout.tsx
+import type { Metadata } from "next";
+import "./globals.css";
+import Navbar from "./components/Navbar";
+import { ThemeProvider } from "@/app/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "./components/AuthProvider";
+
+export const metadata: Metadata = {
+  title: "Reddie",
+  description: "Reddit clone with Next.js",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans antialiased">
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar />
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
+dashboard/pages.tsx
+
+"use client";
+
+import { AuthGuard } from "@/app/components/AuthGuard";
+import { useAuth } from "@/app/components/AuthProvider";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+
+export default function DashboardPage() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  return (
+    <AuthGuard requireAuth={true}>
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome to your Dashboard</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <p className="text-muted-foreground">Logged in as:</p>
+                <p className="font-medium">{user?.email}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Username:</p>
+                <p className="font-medium">{user?.username}</p>
+              </div>
+              <Button onClick={handleLogout} variant="outline">
+                Sign Out
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </AuthGuard>
+  );
+}
+
+api/auth/session/route.ts
 // app/api/auth/session/route.ts
 import { NextResponse } from "next/server";
 import { getSessionToken } from "../[...auth]/cookie";
@@ -107,32 +499,6 @@ export async function GET() {
   }
 }
 
-github/routes.ts
-// app/api/auth/github/route.ts
-import { generateState } from "arctic";
-import { github } from "@/lib/auth";
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-
-export async function GET(): Promise<Response> {
-  const state = generateState();
-  const url = github.createAuthorizationURL(state, ["read:user", "user:email"]);
-
-  const cookieStore = await cookies();
-  cookieStore.set("github_oauth_state", state, {
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    maxAge: 60 * 10, // 10 minutes
-    sameSite: "lax",
-  });
-
-  return NextResponse.redirect(url.toString());
-}
-
-
-github/callback/route.ts
-// app/api/auth/github/callback/route.ts
 // app/api/auth/github/callback/route.ts
 import { github } from "@/lib/auth";
 import { cookies } from "next/headers";
@@ -272,82 +638,28 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
+// app/api/auth/github/route.ts
+import { generateState } from "arctic";
+import { github } from "@/lib/auth";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
-api/auth/[...auth]/session.ts
-import { sha256 } from "@oslojs/crypto/sha2";
-// import { webcrypto as crypto } from "crypto"; // Add this import
-import { prisma } from "@/lib/db"; // Prisma client instance
-import {
-  encodeBase32LowerCaseNoPadding,
-  encodeHexLowerCase,
-} from "@oslojs/encoding";
+export async function GET(): Promise<Response> {
+  const state = generateState();
+  const url = github.createAuthorizationURL(state, ["read:user", "user:email"]);
 
-const SESSION_REFRESH_INTERVAL_MS = 1000 * 60 * 60 * 24 * 15; // 15 days
-const SESSION_MAX_DURATION_MS = SESSION_REFRESH_INTERVAL_MS * 2; // 30 days
-
-const fromSessionTokenToSessionId = (sessionToken: string) => {
-  return encodeHexLowerCase(sha256(new TextEncoder().encode(sessionToken)));
-};
-const crypto = globalThis.crypto;
-
-export const generateRandomSessionToken = () => {
-  const bytes = new Uint8Array(20);
-  crypto.getRandomValues(bytes); // Now uses the correct crypto instance
-  return encodeBase32LowerCaseNoPadding(bytes);
-};
-
-export const createSession = async (sessionToken: string, userId: string) => {
-  const sessionId = fromSessionTokenToSessionId(sessionToken);
-
-  const session = {
-    id: sessionId,
-    userId,
-    sessionToken,
-    expires: new Date(Date.now() + SESSION_MAX_DURATION_MS), // Change expiresAt to expires
-  };
-
-  await prisma.session.create({ data: session });
-  return session;
-};
-
-export const validateSession = async (sessionToken: string) => {
-  const sessionId = fromSessionTokenToSessionId(sessionToken);
-
-  const result = await prisma.session.findUnique({
-    where: { id: sessionId },
-    include: { user: true },
+  const cookieStore = await cookies();
+  cookieStore.set("github_oauth_state", state, {
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    maxAge: 60 * 10, // 10 minutes
+    sameSite: "lax",
   });
 
-  if (!result) return { session: null, user: null };
-
-  const { user, ...session } = result;
-
-  if (Date.now() >= session.expires.getTime()) {
-    await prisma.session.delete({ where: { id: sessionId } });
-    return { session: null, user: null };
-  }
-
-  if (Date.now() >= session.expires.getTime() - SESSION_REFRESH_INTERVAL_MS) {
-    session.expires = new Date(Date.now() + SESSION_MAX_DURATION_MS);
-    await prisma.session.update({
-      where: { id: sessionId },
-      data: { expires: session.expires },
-    });
-  }
-
-  return { session, user };
-};
-
-export const invalidateSession = async (sessionToken: string) => {
-  try {
-    await prisma.session.delete({ where: { sessionToken: sessionToken } });
-  } catch (error) {
-    console.error("Error invalidating session:", error);
-    throw new Error("Failed to invalidate session");
-  }
-};
-
-api/auth/[...auth]/route.ts
+  return NextResponse.redirect(url.toString());
+}
+api/auth/[...auth]/route.ts 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db"; // Prisma client instance
 import { hashPassword, verifyPasswordHash } from "./password";
@@ -515,7 +827,82 @@ export async function DELETE(req: Request) {
     );
   }
 }
-cookie.ts
+
+session ts 
+import { sha256 } from "@oslojs/crypto/sha2";
+// import { webcrypto as crypto } from "crypto"; // Add this import
+import { prisma } from "@/lib/db"; // Prisma client instance
+import {
+  encodeBase32LowerCaseNoPadding,
+  encodeHexLowerCase,
+} from "@oslojs/encoding";
+
+const SESSION_REFRESH_INTERVAL_MS = 1000 * 60 * 60 * 24 * 15; // 15 days
+const SESSION_MAX_DURATION_MS = SESSION_REFRESH_INTERVAL_MS * 2; // 30 days
+
+const fromSessionTokenToSessionId = (sessionToken: string) => {
+  return encodeHexLowerCase(sha256(new TextEncoder().encode(sessionToken)));
+};
+const crypto = globalThis.crypto;
+
+export const generateRandomSessionToken = () => {
+  const bytes = new Uint8Array(20);
+  crypto.getRandomValues(bytes); // Now uses the correct crypto instance
+  return encodeBase32LowerCaseNoPadding(bytes);
+};
+
+export const createSession = async (sessionToken: string, userId: string) => {
+  const sessionId = fromSessionTokenToSessionId(sessionToken);
+
+  const session = {
+    id: sessionId,
+    userId,
+    sessionToken,
+    expires: new Date(Date.now() + SESSION_MAX_DURATION_MS), // Change expiresAt to expires
+  };
+
+  await prisma.session.create({ data: session });
+  return session;
+};
+
+export const validateSession = async (sessionToken: string) => {
+  const sessionId = fromSessionTokenToSessionId(sessionToken);
+
+  const result = await prisma.session.findUnique({
+    where: { id: sessionId },
+    include: { user: true },
+  });
+
+  if (!result) return { session: null, user: null };
+
+  const { user, ...session } = result;
+
+  if (Date.now() >= session.expires.getTime()) {
+    await prisma.session.delete({ where: { id: sessionId } });
+    return { session: null, user: null };
+  }
+
+  if (Date.now() >= session.expires.getTime() - SESSION_REFRESH_INTERVAL_MS) {
+    session.expires = new Date(Date.now() + SESSION_MAX_DURATION_MS);
+    await prisma.session.update({
+      where: { id: sessionId },
+      data: { expires: session.expires },
+    });
+  }
+
+  return { session, user };
+};
+
+export const invalidateSession = async (sessionToken: string) => {
+  try {
+    await prisma.session.delete({ where: { sessionToken: sessionToken } });
+  } catch (error) {
+    console.error("Error invalidating session:", error);
+    throw new Error("Failed to invalidate session");
+  }
+};
+
+cookies.ts 
 // app/api/auth/[...auth]/cookie.ts
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -606,12 +993,9 @@ export const hasSessionToken = async (): Promise<boolean> => {
   }
 };
 
-signup//page.tsx
+login/pages.tsx
 "use client";
-import { useState } from "react";
 import Link from "next/link";
-import { signIn, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -623,493 +1007,166 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Camera as IconSpinner } from "lucide-react";
 import { Icons } from "@/components/ui/icons";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/AuthProvider";
 import { AuthGuard } from "@/app/components/AuthGuard";
 
-export default function SignUpPage() {
-  const { signup } = useAuth();
-
+export default function SignInPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    username: "",
-  });
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login, loginWithGithub } = useAuth();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  // src/app/(public)/signup/page.tsx
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
-
     try {
-      // Validate input
-      if (!formData.email || !formData.password || !formData.username) {
-        setError("Please fill in all fields.");
-        return;
-      }
-      await signup(formData.email, formData.password, formData.username);
+      await login(email, password);
+
       toast({
-        title: "Account Created",
-        description: "Your account has been successfully created.",
+        title: "Success",
+        description: "Logged in successfully",
       });
+
+      //
+      router.refresh();
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Something went wrong");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Something went wrong",
+      });
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleSocialSignIn = (provider: string) => {
+  const handleGithubLogin = async () => {
     try {
-      setIsLoading(true);
-      signIn(provider, { callbackUrl: "/dashboard" });
+      await loginWithGithub();
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
+        title: "Error",
+        description: "GitHub login failed. Please try again.",
       });
-      //toaster
-      setError(error instanceof Error ? error.message : "Something went wrong");
+    }
+  };
+  const handleSocialAuth = async (provider: string) => {
+    setIsLoading(true);
+    try {
+      // Implement proper social auth flow
+      await signIn(provider, { callbackUrl: "/dashboard" });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Authentication failed",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <AuthGuard requireAuth={false}>
       <div className="grid w-full grow items-center px-4 sm:justify-center">
-        <Card className="w-full sm:w-96">
+        <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle>Create your account</CardTitle>
+            <CardTitle>Sign in to Reddie</CardTitle>
             <CardDescription>
-              Welcome! Please fill in the details to get started.
+              Welcome back! Please sign in to continue
             </CardDescription>
           </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="grid gap-y-4">
-              <div className="grid grid-cols-2 gap-x-4">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => handleSocialSignIn("github")}
-                >
-                  {isLoading ? (
-                    <Icons.spinner className="size-4 animate-spin" />
-                  ) : (
-                    <>
-                      <Icons.gitHub className="mr-2 size-4" />
-                      GitHub
-                    </>
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => handleSocialSignIn("google")}
-                >
-                  {isLoading ? (
-                    <Icons.spinner className="size-4 animate-spin" />
-                  ) : (
-                    <>
-                      <Icons.google className="mr-2 size-4" />
-                      Google
-                    </>
-                  )}
-                </Button>
+          <CardContent className="grid gap-4">
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                disabled={isLoading}
+                onClick={() => handleGithubLogin()}
+              >
+                {isLoading ? (
+                  <IconSpinner className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <Icons.gitHub className="mr-2 h-4 w-4" />
+                    GitHub
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                disabled={isLoading}
+                onClick={() => handleSocialAuth("google")}
+              >
+                {isLoading ? (
+                  <IconSpinner className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <Icons.google className="mr-2 h-4 w-4" />
+                    Google
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
               </div>
-
-              <p className="flex items-center gap-x-3 text-sm text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
-                or
-              </p>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3">
+            <Button
+              className="w-full"
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              {isLoading && (
+                <IconSpinner className="mr-2 h-4 w-4 animate-spin" />
               )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </CardContent>
-
-            <CardFooter>
-              <div className="grid w-full gap-y-4">
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <Icons.spinner className="size-4 animate-spin" />
-                  ) : (
-                    "Sign up"
-                  )}
-                </Button>
-                <Button variant="link" size="sm" asChild>
-                  <Link href="/login">Already have an account? Sign in</Link>
-                </Button>
-              </div>
-            </CardFooter>
-          </form>
+              Sign In
+            </Button>
+            <div className="text-center text-sm">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="underline">
+                Sign up
+              </Link>
+            </div>
+          </CardFooter>
         </Card>
       </div>
     </AuthGuard>
   );
-}
-middleware.ts
-// middleware.ts
-import { validateSession } from "@/app/api/auth/[...auth]/session";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-// Define routes configuration
-const ROUTES = {
-  public: ["/", "/about", "/contact"],
-  auth: ["/login", "/signup", "/forgot-password"],
-  protected: ["/dashboard", "/profile", "/settings"],
-  default: "/dashboard",
-};
-
-export async function middleware(request: NextRequest) {
-  const sessionToken = request.cookies.get("session")?.value;
-  const { pathname } = request.nextUrl;
-
-  // Check if current path matches any route type
-  const isAuthRoute = ROUTES.auth.some((route) => pathname.startsWith(route));
-  const isPublicRoute = ROUTES.public.some((route) =>
-    pathname.startsWith(route)
-  );
-  const isProtectedRoute = ROUTES.protected.some((route) =>
-    pathname.startsWith(route)
-  );
-
-  // Function to validate session and return user data
-  const validateUserSession = async () => {
-    if (!sessionToken) return null;
-    try {
-      const { session, user } = await validateSession(sessionToken);
-      return session && user ? { session, user } : null;
-    } catch (error) {
-      console.error("Session validation error:", error);
-      return null;
-    }
-  };
-
-  // Handle authentication routes (login, signup)
-  if (isAuthRoute) {
-    const userData = await validateUserSession();
-    if (userData) {
-      // Redirect authenticated users away from auth routes
-      return NextResponse.redirect(new URL(ROUTES.default, request.url));
-    }
-    return NextResponse.next();
-  }
-
-  // Handle public routes
-  if (isPublicRoute) {
-    return NextResponse.next();
-  }
-
-  // Handle protected routes
-  if (isProtectedRoute) {
-    const userData = await validateUserSession();
-    if (!userData) {
-      // Redirect unauthenticated users to login
-      const redirectUrl = new URL("/login", request.url);
-      redirectUrl.searchParams.set("from", pathname);
-      return NextResponse.redirect(redirectUrl);
-    }
-
-    // Add user info to headers for API routes
-    const response = NextResponse.next();
-    response.headers.set("x-user-id", userData.user.id);
-    response.headers.set("x-user-email", userData.user.email);
-    return response;
-  }
-
-  // Default handling for unspecified routes
-  return NextResponse.next();
-}
-
-export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-};
-component/authguard.ts
-"use client";
-
-import { useAuth } from "./AuthProvider";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-}
-export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
-  const { user, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (requireAuth && !user) {
-        router.push("/login");
-      } else if (!requireAuth && user) {
-        router.push("/dashboard");
-      }
-    }
-  }, [user, isLoading, requireAuth, router]);
-
-  if (isLoading) {
-    return <div>Loading...</div>; // Or your loading component
-  }
-
-  if (requireAuth && !user) {
-    return null;
-  }
-
-  if (!requireAuth && user) {
-    return null;
-  }
-
-  return <>{children}</>;
-}
-authprovider.tsx
-"use client";
-import { createContext, useContext, useEffect, useState } from "react";
-import { redirect, useRouter } from "next/navigation";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  signup: (email: string, password: string, username: string) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshSession: () => Promise<void>;
-  loginWithGithub: () => Promise<void>; // Add this new method
-}
-
-const AuthContext = createContext<AuthContextType | null>(null);
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-
-  const refreshSession = async () => {
-    try {
-      const response = await fetch("/api/auth/session", {
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-        return data.user;
-      } else {
-        setUser(null);
-        return null;
-      }
-    } catch (error) {
-      console.error("Session refresh failed:", error);
-      setUser(null);
-      return null;
-      router.push("/login");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    refreshSession();
-  }, []);
-
-  const signup = async (email: string, password: string, username: string) => {
-    try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password, username }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Signup failed");
-      }
-
-      setUser(data.user);
-      router.push("/dashboard");
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await fetch("/api/auth/signin", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
-      }
-
-      setUser(data.user);
-      router.push("/dashboard");
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      const response = await fetch("/api/auth/signout", {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Logout failed");
-      }
-
-      setUser(null);
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      throw error;
-    }
-  };
-  const loginWithGithub = async () => {
-    try {
-      window.location.href = "/api/auth/github";
-    } catch (error) {
-      console.error("GitHub login failed:", error);
-      throw error;
-    }
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        loginWithGithub,
-        signup,
-        login,
-        logout,
-        refreshSession,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
-session/route.ts
-// app/api/auth/session/route.ts
-import { NextResponse } from "next/server";
-import { getSessionToken } from "../[...auth]/cookie";
-import { validateSession } from "../[...auth]/session";
-
-export async function GET() {
-  try {
-    const sessionToken = await getSessionToken();
-
-    if (!sessionToken) {
-      return NextResponse.json(
-        { error: "No session found" },
-        { status: 401 }
-      );
-    }
-
-    const { session, user } = await validateSession(sessionToken);
-
-    if (!session || !user) {
-      return NextResponse.json(
-        { error: "Invalid session" },
-        { status: 401 }
-      );
-    }
-
-    return NextResponse.json({
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      }
-    });
-  } catch (error) {
-    console.error("Session validation error:", error);
-    return NextResponse.json(
-      { error: "Failed to validate session" },
-      { status: 500 }
-    );
-  }
 }

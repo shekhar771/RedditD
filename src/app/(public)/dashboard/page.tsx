@@ -24,6 +24,7 @@ export default function DashboardPage() {
       <div className="container mx-auto p-6">
         <Card>
           <CardHeader>
+            <div>array</div>
             <CardTitle>Welcome to your Dashboard</CardTitle>
           </CardHeader>
           <CardContent>

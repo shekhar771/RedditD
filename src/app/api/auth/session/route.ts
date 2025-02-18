@@ -8,19 +8,13 @@ export async function GET() {
     const sessionToken = await getSessionToken();
 
     if (!sessionToken) {
-      return NextResponse.json(
-        { error: "No session found" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "No session found" }, { status: 401 });
     }
 
     const { session, user } = await validateSession(sessionToken);
 
     if (!session || !user) {
-      return NextResponse.json(
-        { error: "Invalid session" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
     }
 
     return NextResponse.json({
@@ -28,7 +22,9 @@ export async function GET() {
         id: user.id,
         username: user.username,
         email: user.email,
-      }
+        name: user.name || null,
+        image: user.image || null,
+      },
     });
   } catch (error) {
     console.error("Session validation error:", error);
