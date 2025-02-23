@@ -23,7 +23,7 @@ import { useAuth } from "@/app/components/AuthProvider";
 import { AuthGuard } from "@/app/components/AuthGuard";
 
 export default function SignUpPage() {
-  const { loginWithGithub, signup } = useAuth();
+  const { loginWithGithub,loginWithGoogle, signup } = useAuth();
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -40,6 +40,16 @@ export default function SignUpPage() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "GitHub login failed. Please try again.",
+      });
+    }
   };
   const handleGithubLogin = async () => {
     try {
@@ -126,7 +136,7 @@ export default function SignUpPage() {
                   variant="outline"
                   type="button"
                   disabled={isLoading}
-                  onClick={() => handleSocialSignIn("google")}
+                  onClick={() => handleGoogleLogin()}
                 >
                   {isLoading ? (
                     <Icons.spinner className="size-4 animate-spin" />

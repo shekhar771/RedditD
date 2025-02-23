@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL("/login?error=missing_params", req.url));
     }
 
-    const cookieStore = await cookies();
+    const cookieStore = await cookies(); // ✅ Await cookies()
     const storedState = cookieStore.get("google_oauth_state")?.value;
     const codeVerifier = cookieStore.get("google_code_verifier")?.value;
 
@@ -21,7 +21,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL("/login?error=invalid_state", req.url));
     }
 
-    // ✅ Corrected token request
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -30,7 +29,7 @@ export async function GET(req: NextRequest) {
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
         code,
         grant_type: "authorization_code",
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI!, // ✅ Use correct redirect URI
+        redirect_uri: `${process.env.NEXT_PUBLIC_APP_URI}/api/auth/google/callback`,
         code_verifier: codeVerifier!,
       }),
     });

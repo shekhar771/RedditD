@@ -24,7 +24,7 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loginWithGithub } = useAuth();
+  const { login,loginWithGoogle , loginWithGithub } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +53,17 @@ export default function SignInPage() {
   const handleGithubLogin = async () => {
     try {
       await loginWithGithub();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "GitHub login failed. Please try again.",
+      });
+    }
+  };
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -107,7 +118,7 @@ export default function SignInPage() {
               <Button
                 variant="outline"
                 disabled={isLoading}
-                onClick={() => handleSocialAuth("google")}
+                onClick={() => handleGoogleLogin()}
               >
                 {isLoading ? (
                   <IconSpinner className="h-4 w-4 animate-spin" />
