@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import { ThemeProvider } from "@/app/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./components/AuthProvider";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "Reddie",
@@ -12,7 +13,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  authModal,
+}: Readonly<{
+  children: React.ReactNode;
+  authModal: React.ReactNode;
+}>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased">
@@ -24,6 +29,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Navbar />
+            {authModal}
             {children}
             <Toaster />
           </ThemeProvider>
