@@ -1,5 +1,6 @@
 "use client";
 import SignInPage from "@/app/(public)/login/page";
+import SignUpPage from "@/app/(public)/signup/page";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -19,7 +20,7 @@ const page: FC<pageProps> = ({}) => {
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <SignInPage />
+        <SignUpPage />
       </div>
     </div>
     // </div>
