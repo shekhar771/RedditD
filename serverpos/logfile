@@ -179,3 +179,4 @@
 2025-02-24 12:08:18.383 IST [2868] LOG:  redo done at 0/631E2C8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
 2025-02-24 12:08:18.394 IST [7036] LOG:  checkpoint starting: end-of-recovery immediate wait
 2025-02-24 12:08:18.440 IST [7036] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.018 s, sync=0.010 s, total=0.053 s; sync files=2, longest=0.005 s, average=0.005 s; distance=0 kB, estimate=0 kB; lsn=0/631E300, redo lsn=0/631E300
+2025-02-24 12:08:18.504 IST [14876] LOG:  database system is ready to accept connections
