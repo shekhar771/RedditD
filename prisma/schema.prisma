@@ -6,12 +6,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-
 }
-
 
 model Account {
   id                String  @id @default(cuid())
@@ -39,19 +37,38 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-
+  @@index([userId])
 }
 
 model User {
   id            String    @id @default(cuid())
   name          String?
-    username      String?   @unique  // Add this line
-email         String?   @unique
+  username      String?   @unique // Add this line
+  email         String?   @unique
   emailVerified DateTime?
-  passwordHash String?
+  passwordHash  String?
+  comments      Comment[]
+  posts         Post[]
 
   image    String?
   accounts Account[]
   sessions Session[]
+}
+
+model subreddit {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  post      Post[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+model Post {
+  id      String @id @default(cuid())
+  title   String
+  content Json?
+
+  subreddit   subreddit @relation(fields: [subredditId], references: [id])
+  subredditId String
+  author      User      @relation(fields: [authorId], references: [id])
 }
