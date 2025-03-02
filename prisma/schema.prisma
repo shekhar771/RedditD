@@ -47,13 +47,14 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   passwordHash  String?
-  comments      Comment[]
   posts         Post[]
 
   image    String?
   accounts Account[]
   sessions Session[]
 }
+
+// comments      Comment[]
 
 model subreddit {
   id        String   @id @default(cuid())
@@ -70,5 +71,8 @@ model Post {
 
   subreddit   subreddit @relation(fields: [subredditId], references: [id])
   subredditId String
-  author      User      @relation(fields: [authorId], references: [id])
+  User        User?     @relation(fields: [userId], references: [id])
+  userId      String?
 }
+
+// author      User      @relation(fields: [authorId], references: [id])

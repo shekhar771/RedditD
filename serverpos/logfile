@@ -223,3 +223,14 @@
 2025-03-01 18:06:27.120 IST [22372] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
 2025-03-01 18:06:27.120 IST [22372] LOG:  aborting startup due to startup process failure
 2025-03-01 18:06:27.123 IST [22372] LOG:  database system is shut down
+2025-03-02 13:45:27.823 IST [7080] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-03-02 13:45:27.967 IST [7080] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-02 13:45:27.967 IST [7080] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-02 13:45:28.134 IST [23364] LOG:  database system was interrupted; last known up at 2025-03-01 15:41:00 IST
+2025-03-02 13:45:38.147 IST [23364] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-03-02 13:45:38.165 IST [23364] LOG:  redo starts at 0/63203A8
+2025-03-02 13:45:38.165 IST [23364] LOG:  invalid record length at 0/63203E0: expected at least 24, got 0
+2025-03-02 13:45:38.165 IST [23364] LOG:  redo done at 0/63203A8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-03-02 13:45:38.182 IST [14732] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-03-02 13:45:38.245 IST [14732] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.023 s, sync=0.014 s, total=0.073 s; sync files=2, longest=0.007 s, average=0.007 s; distance=0 kB, estimate=0 kB; lsn=0/63203E0, redo lsn=0/63203E0
+2025-03-02 13:45:38.322 IST [7080] LOG:  database system is ready to accept connections

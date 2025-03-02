@@ -50,38 +50,32 @@ export async function POST(req: Request) {
     // Hash the password
     const passwordHash = await hashPassword(password);
 
-    // Create the user and account in a transaction
-    const [user, account] = await prisma.$transaction([
-      prisma.user.create({
-        data: {
-          username,
-          email,
-          passwordHash,
-          name: null,
-          image: null,
-        },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          name: true,
-          image: true,
-        },
-      }),
-      prisma.account.create({
-        data: {
-          userId: "", // Placeholder, will be replaced in the transaction
-          type: "email_password",
-          provider: "credentials",
-          providerAccountId: email, // Use email as the providerAccountId
-        },
-      }),
-    ]);
+    // Create the user in the database
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        passwordHash,
+        name: null,
+        image: null,
+      },
+      // Explicitly select which fields to return
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        image: true,
+      },
+    });
 
-    // Update the account with the user ID
-    await prisma.account.update({
-      where: { id: account.id },
-      data: { userId: user.id },
+    const account = await prisma.account.create({
+      data: {
+        userId: user.id,
+        type: "email_password",
+        provider: "credentials",
+        providerAccountId: email,
+      },
     });
 
     // Create a session for the user
@@ -137,24 +131,6 @@ export async function PUT(req: Request) {
         { error: "Invalid credentials" },
         { status: 401 }
       );
-    }
-    let account = await prisma.account.findFirst({
-      where: {
-        userId: user.id,
-        provider: "credentials",
-      },
-    });
-
-    // If no account exists, create one
-    if (!account) {
-      account = await prisma.account.create({
-        data: {
-          userId: user.id,
-          type: "email_password",
-          provider: "credentials",
-          providerAccountId: email, // Use email as the providerAccountId
-        },
-      });
     }
 
     // Create a session for the user
