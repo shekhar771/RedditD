@@ -191,3 +191,35 @@
 2025-02-25 09:17:21.670 IST [11360] LOG:  checkpoint starting: end-of-recovery immediate wait
 2025-02-25 09:17:21.724 IST [11360] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.020 s, sync=0.011 s, total=0.061 s; sync files=2, longest=0.006 s, average=0.006 s; distance=0 kB, estimate=0 kB; lsn=0/631E3B0, redo lsn=0/631E3B0
 2025-02-25 09:17:21.794 IST [10156] LOG:  database system is ready to accept connections
+2025-02-27 21:20:16.439 IST [27768] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-02-27 21:20:16.581 IST [27768] LOG:  listening on IPv6 address "::1", port 5432
+2025-02-27 21:20:16.582 IST [27768] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-02-27 21:20:16.752 IST [15300] LOG:  database system was interrupted; last known up at 2025-02-25 09:17:21 IST
+2025-02-27 21:20:26.154 IST [15300] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-02-27 21:20:26.170 IST [15300] LOG:  redo starts at 0/631E428
+2025-02-27 21:20:26.170 IST [15300] LOG:  invalid record length at 0/631E460: expected at least 24, got 0
+2025-02-27 21:20:26.170 IST [15300] LOG:  redo done at 0/631E428 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-02-27 21:20:26.188 IST [30176] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-02-27 21:20:26.261 IST [30176] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.027 s, sync=0.014 s, total=0.083 s; sync files=2, longest=0.008 s, average=0.007 s; distance=0 kB, estimate=0 kB; lsn=0/631E460, redo lsn=0/631E460
+2025-02-27 21:20:26.339 IST [27768] LOG:  database system is ready to accept connections
+2025-02-27 21:45:26.311 IST [30176] LOG:  checkpoint starting: time
+2025-02-27 21:45:27.037 IST [30176] LOG:  checkpoint complete: wrote 7 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.669 s, sync=0.016 s, total=0.741 s; sync files=7, longest=0.007 s, average=0.003 s; distance=7 kB, estimate=7 kB; lsn=0/6320280, redo lsn=0/6320228
+2025-03-01 15:40:51.029 IST [22372] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-03-01 15:40:51.105 IST [22372] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-01 15:40:51.105 IST [22372] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-01 15:40:51.290 IST [21512] LOG:  database system was interrupted; last known up at 2025-02-27 21:45:27 IST
+2025-03-01 15:41:00.430 IST [21512] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-03-01 15:41:00.449 IST [21512] LOG:  redo starts at 0/6320228
+2025-03-01 15:41:00.450 IST [21512] LOG:  invalid record length at 0/6320330: expected at least 24, got 0
+2025-03-01 15:41:00.450 IST [21512] LOG:  redo done at 0/63202F8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-03-01 15:41:00.470 IST [22468] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-03-01 15:41:00.568 IST [22468] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.031 s, sync=0.025 s, total=0.109 s; sync files=2, longest=0.015 s, average=0.013 s; distance=0 kB, estimate=0 kB; lsn=0/6320330, redo lsn=0/6320330
+2025-03-01 15:41:00.675 IST [22372] LOG:  database system is ready to accept connections
+2025-03-01 18:06:26.945 IST [22372] LOG:  autovacuum launcher process (PID 11024) was terminated by exception 0x40010004
+2025-03-01 18:06:26.945 IST [22372] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-03-01 18:06:26.946 IST [22372] LOG:  terminating any other active server processes
+2025-03-01 18:06:26.993 IST [22372] LOG:  all server processes terminated; reinitializing
+2025-03-01 18:06:27.120 IST [22372] LOG:  startup process (PID 8116) was terminated by exception 0xC000026B
+2025-03-01 18:06:27.120 IST [22372] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-03-01 18:06:27.120 IST [22372] LOG:  aborting startup due to startup process failure
+2025-03-01 18:06:27.123 IST [22372] LOG:  database system is shut down
