@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/AuthProvider";
 import { AuthGuard } from "@/app/components/AuthGuard";
 
+
 export default function SignInPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +27,13 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const { login,loginWithGoogle , loginWithGithub } = useAuth();
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       await login(email, password);
+
 
       toast({
         title: "Success",

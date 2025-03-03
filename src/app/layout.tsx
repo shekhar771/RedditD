@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./components/AuthProvider";
 import React from "react";
 
+
 export const metadata: Metadata = {
   title: "Reddie",
   description: "Reddit clone with Next.js",
@@ -34,6 +35,7 @@ export default function RootLayout({
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
+
       </body>
     </html>
   );

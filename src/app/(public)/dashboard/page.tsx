@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthGuard } from "@/app/components/AuthGuard";
+
 import { useAuth } from "@/app/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,7 @@ export default function DashboardPage() {
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
+
     }
   };
 

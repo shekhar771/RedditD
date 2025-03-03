@@ -1,7 +1,9 @@
 // middleware.ts
+
 import { validateSession } from "@/app/api/auth/[...auth]/session";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+
 
 // Define routes configuration
 const ROUTES = {
@@ -14,6 +16,7 @@ const ROUTES = {
 export async function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get("session")?.value;
   const { pathname } = request.nextUrl;
+
 
   // Check if current path matches any route type
   const isAuthRoute = ROUTES.auth.some((route) => pathname.startsWith(route));
@@ -42,6 +45,7 @@ export async function middleware(request: NextRequest) {
     if (userData) {
       // Redirect authenticated users away from auth routes
       return NextResponse.redirect(new URL(ROUTES.default, request.url));
+
     }
     return NextResponse.next();
   }
@@ -56,6 +60,7 @@ export async function middleware(request: NextRequest) {
     const userData = await validateUserSession();
     if (!userData) {
       // Redirect unauthenticated users to login
+ 
       const redirectUrl = new URL("/login", request.url);
       redirectUrl.searchParams.set("from", pathname);
       return NextResponse.redirect(redirectUrl);
