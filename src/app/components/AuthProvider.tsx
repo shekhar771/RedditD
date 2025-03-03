@@ -1,25 +1,36 @@
-"use client"
+"use client";
+
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 interface User {
   id: string;
-  username: string;
-  email: string;
+  username: string | null;
+  email: string | null;
+  name?: string | null;
+  image?: string | null;
+}
+
+interface Session {
+  user: User;
 }
 
 interface AuthContextType {
+  session: Session | null;
   user: User | null;
   isLoading: boolean;
   signup: (email: string, password: string, username: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
+  loginWithGithub: () => Promise<void>;
+  loginWithGoogle: () => Promise<void>; // Added Google
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -32,15 +43,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
-        return data.user;
+        const newUser = data.user
+          ? {
+              ...data.user,
+              name: data.user.name || data.user.username,
+            }
+          : null;
+
+        setUser(newUser);
+        setSession(newUser ? { user: newUser } : null);
+        return newUser;
       } else {
         setUser(null);
+        setSession(null);
         return null;
       }
     } catch (error) {
       console.error("Session refresh failed:", error);
       setUser(null);
+      setSession(null);
       return null;
     } finally {
       setIsLoading(false);
@@ -66,7 +87,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.error || "Signup failed");
       }
 
-      setUser(data.user);
+      const newUser = {
+        ...data.user,
+        name: data.user.name || data.user.username,
+      };
+
+      setUser(newUser);
+      setSession({ user: newUser });
       router.push("/dashboard");
     } catch (error) {
       throw error;
@@ -88,7 +115,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.error || "Login failed");
       }
 
-      setUser(data.user);
+      const newUser = {
+        ...data.user,
+        name: data.user.name || data.user.username,
+      };
+
+      setUser(newUser);
+      setSession({ user: newUser });
       router.push("/dashboard");
     } catch (error) {
       throw error;
@@ -107,6 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUser(null);
+      setSession(null);
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -114,9 +148,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginWithGithub = async () => {
+    try {
+      window.location.href = "/api/auth/github";
+    } catch (error) {
+      console.error("GitHub login failed:", error);
+      throw error;
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      window.location.href = "/api/auth/google";
+    } catch (error) {
+      console.error("Google login failed:", error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, signup, login, logout, refreshSession }}
+      value={{
+        session,
+        user,
+        isLoading,
+        signup,
+        login,
+        logout,
+        refreshSession,
+        loginWithGithub,
+        loginWithGoogle,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -129,4 +191,17 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+};
+
+// Convenience hook to match NextAuth pattern
+export const useSession = () => {
+  const { session, isLoading } = useAuth();
+  return {
+    data: session,
+    status: isLoading
+      ? "loading"
+      : session
+      ? "authenticated"
+      : "unauthenticated",
+  };
 };

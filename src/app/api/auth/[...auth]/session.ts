@@ -62,38 +62,11 @@ export const validateSession = async (sessionToken: string) => {
   return { session, user };
 };
 
-export const invalidateSession = async (sessionId: string) => {
-  await prisma.session.delete({ where: { id: sessionId } });
-};
-
-
-
-export async function GET(req: NextRequest) {
+export const invalidateSession = async (sessionToken: string) => {
   try {
-    const sessionToken = cookies().get("session")?.value;
-
-    if (!sessionToken) {
-      return NextResponse.json({ error: "No session found" }, { status: 401 });
-    }
-
-    const { session, user } = await validateSession(sessionToken);
-
-    if (!session || !user) {
-      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
-    }
-
-    return NextResponse.json({
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      },
-    });
+    await prisma.session.delete({ where: { sessionToken: sessionToken } });
   } catch (error) {
-    console.error("Session validation error:", error);
-    return NextResponse.json(
-      { error: "Session validation failed" },
-      { status: 500 }
-    );
+    console.error("Error invalidating session:", error);
+    throw new Error("Failed to invalidate session");
   }
-}
+};

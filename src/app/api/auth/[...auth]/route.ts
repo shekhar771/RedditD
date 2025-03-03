@@ -6,11 +6,12 @@ import {
   createSession,
   invalidateSession,
 } from "./session";
-import { setSessionCookie, deleteSessionCookie } from "./cookie";
+import {
+  setSessionCookie,
+  deleteSessionCookie,
+  SESSION_COOKIE_NAME,
+} from "./cookie";
 import { cookies } from "next/headers";
-
-
-
 
 // Handle POST request for signup
 
@@ -55,12 +56,25 @@ export async function POST(req: Request) {
         username,
         email,
         passwordHash,
+        name: null,
+        image: null,
       },
       // Explicitly select which fields to return
       select: {
         id: true,
         username: true,
         email: true,
+        name: true,
+        image: true,
+      },
+    });
+
+    const account = await prisma.account.create({
+      data: {
+        userId: user.id,
+        type: "email_password",
+        provider: "credentials",
+        providerAccountId: email,
       },
     });
 
@@ -97,8 +111,6 @@ export async function POST(req: Request) {
   }
 }
 
-
-
 // Handle PUT request for signin
 export async function PUT(req: Request) {
   try {
@@ -126,7 +138,18 @@ export async function PUT(req: Request) {
     const session = await createSession(sessionToken, user.id);
 
     // Set the session cookie
-    const response = NextResponse.json({ user }, { status: 200 });
+    const response = NextResponse.json(
+      {
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          name: user.name || null,
+          image: user.image || null,
+        },
+      },
+      { status: 200 }
+    );
     await setSessionCookie(sessionToken, session.expires, response);
 
     return response;
@@ -142,8 +165,9 @@ export async function PUT(req: Request) {
 // Handle DELETE request for signout
 export async function DELETE(req: Request) {
   try {
+    const cookiestore = cookies();
+    const sessionToken = (await cookiestore).get(SESSION_COOKIE_NAME)?.value;
     // Get the session token from the cookie
-    const sessionToken = (await cookies()).get("session")?.value;
     if (!sessionToken) {
       return NextResponse.json({ error: "No session found" }, { status: 400 });
     }
@@ -156,9 +180,7 @@ export async function DELETE(req: Request) {
       { message: "Signed out successfully" },
       { status: 200 }
     );
-    await deleteSessionCookie(response);
-
-    return response;
+    return await deleteSessionCookie(response);
   } catch (error) {
     console.error("Signout error:", error);
     return NextResponse.json(

@@ -6,10 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-
 }
 
 
@@ -39,19 +38,107 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-
+  @@index([userId])
 }
 
 model User {
   id            String    @id @default(cuid())
   name          String?
-    username      String?   @unique  // Add this line
-email         String?   @unique
+  username      String?   @unique // Add this line
+  email         String?   @unique
   emailVerified DateTime?
-  passwordHash String?
+  passwordHash  String?
+  image         String?
 
-  image    String?
-  accounts Account[]
-  sessions Session[]
+  createdSubreddits Subreddit[]    @relation("CreatedBy")
+  posts             Post[]
+  accounts          Account[]
+  sessions          Session[]
+  Comment           Comment[]
+  CommentVote       CommentVote[]
+  Vote              Vote[]
+  Subscription      Subscription[]
 }
+
+// comments      Comment[]
+
+model Subreddit {
+  id          String         @id @default(cuid())
+  name        String         @unique
+  post        Post[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime
+  creatorId   String?
+  Creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
+  Subscribers Subscription[]
+  description String?
+
+  @@index([name])
+}
+
+model Subscription {
+  user        User      @relation(fields: [UserId], references: [id])
+  UserId      String
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+  subredditId String
+
+  @@id([UserId, subredditId])
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  content     Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+  subredditId String
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  comment     Comment[]
+  Vote        Vote[]
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  post      Post      @relation(fields: [postId], references: [id])
+  postId    String
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  replyToID String?
+  replyTo   Comment?  @relation("ReplyTo", fields: [replyToID], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("ReplyTo")
+
+  votes     CommentVote[]
+  commentId String?
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
+}
+
+model Vote {
+  user   User     @relation(fields: [userId], references: [id])
+  userId String
+  post   Post     @relation(fields: [postId], references: [id])
+  postId String
+  type   VoteType
+
+  @@id([userId, postId])
+}
+
+model CommentVote {
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  commentId String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  type      VoteType
+
+  @@id([userId, commentId])
+}
+
+// author      User      @relation(fields: [authorId], references: [id])

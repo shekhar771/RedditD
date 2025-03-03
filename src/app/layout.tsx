@@ -1,46 +1,41 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import { ThemeProvider } from "@/app/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./components/AuthProvider";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import React from "react";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Reddie",
-  description: "reddit clone with Nextjs and ",
+  description: "Reddit clone with Next.js",
 };
 
 export default function RootLayout({
   children,
+  authModal,
 }: Readonly<{
   children: React.ReactNode;
+  authModal: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      ><AuthProvider>
-        {" "}
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Navbar />
-          {children}
-          <Toaster />
-        </ThemeProvider></AuthProvider>
+      <body className="font-sans antialiased">
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar />
+            {authModal}
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </AuthProvider>
+
       </body>
     </html>
   );
