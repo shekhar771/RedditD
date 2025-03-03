@@ -41,7 +41,7 @@ const Navbar = () => {
     }
 
     if (user.username) {
-      return user.username.substring(0, 2).toUpperCase();
+      return user.username.substring(0, 1).toUpperCase();
     }
 
     if (user.email) {
@@ -52,7 +52,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex h-[10vh] w-full items-center border-b px-7 mx-2 md:justify-between px-14 mb-3">
+    <nav className="flex h-[10vh] w-full items-center border-b px-7 justify-between mx-2 md:justify-between px-14 mb-3 bg">
       <Link href="/">
         <Image src={reddie} alt="reddit logo" className="h-14 w-full" />
       </Link>
@@ -66,25 +66,38 @@ const Navbar = () => {
           // User is logged in - show profile dropdown
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 outline-none">
+              <button className="flex items-center gap-2 outline-none border">
                 <Avatar>
                   <AvatarImage
                     src={user.image || undefined}
-                    alt={user.username || "User"}
+                    alt={user.username || "User profile picture"}
+                    referrerPolicy="no-referrer"
                   />
                   <AvatarFallback>{getInitials()}</AvatarFallback>
                 </Avatar>
-                <span className="hidden md:inline">
-                  {user.name || user.username}
-                </span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <div className="flex item-center justify-center flex-col gap-1 p-2">
+                <div className="font-medium">
+                  {user.name && <p>{user.name}</p>}
+                </div>
+                <div className="w-[200px] text-zinc-700 text-sm">
+                  {user.email && <p>{user.email}</p>}
+                </div>
+              </div>
+              <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/dashboard">Dashboard</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/r/create">Create a subreddit</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings">settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>

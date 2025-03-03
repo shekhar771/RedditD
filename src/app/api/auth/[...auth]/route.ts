@@ -69,6 +69,15 @@ export async function POST(req: Request) {
       },
     });
 
+    const account = await prisma.account.create({
+      data: {
+        userId: user.id,
+        type: "email_password",
+        provider: "credentials",
+        providerAccountId: email,
+      },
+    });
+
     // Create a session for the user
     const sessionToken = generateRandomSessionToken();
     // const id = "aaa";
