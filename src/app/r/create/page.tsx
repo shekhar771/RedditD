@@ -9,11 +9,16 @@ import { createSubredditPayload } from "@/lib/validator/subreddit";
 const Page = () => {
   const router = useRouter();
   const [input, setInput] = useState<string>("");
+  const [inputdes, setInputdes] = useState<string>("");
+
   const { mutate: submitData, isLoading } = useMutation({
     mutationFn: async () => {
       const payload: createSubredditPayload = {
         name: input,
+        description: inputdes,
       };
+      console.log("Sending payload:", payload); // Log the payload
+
       const { data } = await axios.post("/api/subreddit", payload);
       return data as string;
     },
@@ -44,6 +49,11 @@ const Page = () => {
               onChange={(e) => setInput(e.target.value)}
             />
           </div>
+          <Input
+            className=""
+            value={inputdes}
+            onChange={(e) => setInputdes(e.target.value)}
+          />
           <div className="flex gap-2 mx-2 my-3">
             <Button
               variant="outline"
