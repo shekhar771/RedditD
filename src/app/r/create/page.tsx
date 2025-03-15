@@ -17,6 +17,13 @@ const Page = () => {
       const { data } = await axios.post("/api/subreddit", payload);
       return data as string;
     },
+    onError: (error) => {
+      console.error("Failed to create subreddit:", error);
+      alert("Failed to create subreddit. Please try again.");
+    },
+    onSuccess: (data) => {
+      console.error("sucess to create subreddit:", data);
+    },
   });
   return (
     <div className="  container flex items-center rounded-lg h-full max-w-3xl mx-auto ">

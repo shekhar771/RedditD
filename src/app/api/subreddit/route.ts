@@ -1,11 +1,11 @@
-// app/api/auth/session/route.ts
-import { NextResponse } from "next/server";
-import { getSessionToken } from "../auth/asa";
+// app/api/subreddit/route.ts
+import { NextResponse, NextRequest } from "next/server";
+import { withAuth } from "@/lib/server-auth";
 
-export async function POST(req: Request) {
+export const POST = withAuth(async (req: NextRequest, user) => {
   try {
-    const session = getSessionToken;
     const { name } = await req.json();
+    return NextResponse.json({ message: "Subreddit created successfully" });
   } catch (error) {
     console.error("failed to create subreddit error:", error);
     return NextResponse.json(
@@ -13,4 +13,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
+});

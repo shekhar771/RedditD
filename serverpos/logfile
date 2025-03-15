@@ -458,4 +458,14 @@
 2025-03-14 19:31:09.204 IST [7568] LOG:  autovacuum launcher process (PID 23308) was terminated by exception 0x40010004
 2025-03-14 19:31:09.204 IST [7568] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
 2025-03-14 19:31:09.205 IST [7568] LOG:  terminating any other active server processes
-^C
+^C2025-03-15 15:17:07.277 IST [22428] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-03-15 15:17:07.345 IST [22428] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-15 15:17:07.346 IST [22428] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-15 15:17:07.536 IST [8560] LOG:  database system was interrupted; last known up at 2025-03-14 18:57:33 IST
+2025-03-15 15:17:15.548 IST [8560] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-03-15 15:17:15.563 IST [8560] LOG:  redo starts at 0/8839BD0
+2025-03-15 15:17:15.563 IST [8560] LOG:  invalid record length at 0/8839C08: expected at least 24, got 0
+2025-03-15 15:17:15.563 IST [8560] LOG:  redo done at 0/8839BD0 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-03-15 15:17:15.580 IST [22232] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-03-15 15:17:15.650 IST [22232] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.026 s, sync=0.015 s, total=0.078 s; sync files=2, longest=0.008 s, average=0.008 s; distance=0 kB, estimate=0 kB; lsn=0/8839C08, redo lsn=0/8839C08
+2025-03-15 15:17:15.727 IST [22428] LOG:  database system is ready to accept connections

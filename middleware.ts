@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
 const ROUTES = {
   public: ["/", "/about", "/contact"],
   auth: ["/login", "/signup", "/forgot-password"],
-  protected: ["/dashboard", "/profile", "/settings"],
+  protected: ["/dashboard", "/profile", "/settings", "/r/create"],
   default: "/dashboard",
 };
 

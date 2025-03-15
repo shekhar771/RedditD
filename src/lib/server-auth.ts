@@ -1,10 +1,8 @@
-// lib/server-auth.ts
 import { cookies } from "next/headers";
 import { validateSession } from "@/app/api/auth/[...auth]/session";
 import { SESSION_COOKIE_NAME } from "@/app/api/auth/[...auth]/cookie";
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 
 export type AuthUser = {
   id: string;
@@ -16,7 +14,7 @@ export type AuthUser = {
 
 // Get the current session without any redirect or error
 export async function getServerSession() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
   if (!sessionToken) {
@@ -63,10 +61,17 @@ export function withAuth(
       const { user } = await validateAuthForApi();
       return await handler(req, user);
     } catch (error) {
-      if (error.message === "Unauthorized") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if (error instanceof Error) {
+        if (error.message === "Unauthorized") {
+          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        console.error("API Error:", error);
+        return NextResponse.json(
+          { error: "Internal Server Error" },
+          { status: 500 }
+        );
       }
-      console.error("API Error:", error);
+      console.error("Unknown Error:", error);
       return NextResponse.json(
         { error: "Internal Server Error" },
         { status: 500 }
@@ -84,8 +89,12 @@ export function withAuthAction<T, A extends any[]>(
       const { user } = await validateAuthForApi();
       return await action(user, ...args);
     } catch (error) {
-      console.error("Server Action Error:", error);
-      return { error: error.message || "An error occurred" };
+      if (error instanceof Error) {
+        console.error("Server Action Error:", error);
+        return { error: error.message || "An error occurred" };
+      }
+      console.error("Unknown Error:", error);
+      return { error: "An error occurred" };
     }
   };
 }
