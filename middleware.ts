@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
 const ROUTES = {
   public: ["/", "/about", "/contact"],
   auth: ["/login", "/signup", "/forgot-password"],
-  protected: ["/dashboard", "/profile", "/settings", "/r/create"],
+  protected: ["/dashboard", "/profile", "/settings", "/r", "/r/create/"],
   default: "/dashboard",
 };
 
@@ -20,9 +20,21 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = ROUTES.public.some((route) =>
     pathname.startsWith(route)
   );
-  const isProtectedRoute = ROUTES.protected.some((route) =>
-    pathname.startsWith(route)
-  );
+  // Update your function to use exact matches or proper path matching
+  const isProtectedRoute = ROUTES.protected.some((route) => {
+    // For exact matches
+    if (pathname === route) return true;
+
+    // For nested routes (e.g., "/r/create/something")
+    if (
+      route.endsWith("/")
+        ? pathname.startsWith(route)
+        : pathname === route || pathname.startsWith(`${route}/`)
+    )
+      return true;
+
+    return false;
+  });
 
   // Function to validate session and return user data
   const validateUserSession = async () => {
@@ -72,6 +84,17 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+// export const config = {
+//   matcher: [
+//     "/dashboard/:path*",
+//     "/profile/:path*",
+//     "/settings/:path*",
+//     "/r/:path*", // Match all routes under /r
+//     "/login",
+//     "/signup",
+//     "/forgot-password",
+//   ],
+// };
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

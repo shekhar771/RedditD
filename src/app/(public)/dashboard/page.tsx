@@ -4,12 +4,9 @@ import { AuthGuard } from "@/app/components/AuthGuard";
 import { useAuth } from "@/app/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { requireAuth } from "@/lib/server-auth";
 import { useRouter } from "next/navigation";
 
-export default async function DashboardPage() {
-  // const user = await requireAuth(); // Server-side auth check
-
+export default function DashboardPage() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
