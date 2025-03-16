@@ -1,5 +1,4 @@
-// middleware.ts
-import { validateSession } from "@/app/api/auth/[...auth]/session";
+// src/middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -7,7 +6,7 @@ import type { NextRequest } from "next/server";
 const ROUTES = {
   public: ["/", "/about", "/contact"],
   auth: ["/login", "/signup", "/forgot-password"],
-  protected: ["/dashboard", "/profile", "/settings", "/r", "/r/create/"],
+  protected: ["/dashboard", "/profile", "/settings", "/r/", "/r/create"],
   default: "/dashboard",
 };
 
@@ -20,30 +19,37 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = ROUTES.public.some((route) =>
     pathname.startsWith(route)
   );
-  // Update your function to use exact matches or proper path matching
   const isProtectedRoute = ROUTES.protected.some((route) => {
-    // For exact matches
     if (pathname === route) return true;
-
-    // For nested routes (e.g., "/r/create/something")
     if (
       route.endsWith("/")
         ? pathname.startsWith(route)
         : pathname === route || pathname.startsWith(`${route}/`)
     )
       return true;
-
     return false;
   });
 
-  // Function to validate session and return user data
+  // Function to validate session by calling the API route
   const validateUserSession = async () => {
     if (!sessionToken) return null;
+
     try {
-      const { session, user } = await validateSession(sessionToken);
-      return session && user ? { session, user } : null;
+      const response = await fetch(
+        `${request.nextUrl.origin}/api/auth/validate-session`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionToken }),
+        }
+      );
+
+      if (!response.ok) return null;
+
+      const { session, user } = await response.json();
+      return { session, user };
     } catch (error) {
-      console.error("Session validation error:", error);
+      console.error("Session validation error from middleware:", error);
       return null;
     }
   };
@@ -52,7 +58,6 @@ export async function middleware(request: NextRequest) {
   if (isAuthRoute) {
     const userData = await validateUserSession();
     if (userData) {
-      // Redirect authenticated users away from auth routes
       return NextResponse.redirect(new URL(ROUTES.default, request.url));
     }
     return NextResponse.next();
@@ -67,34 +72,28 @@ export async function middleware(request: NextRequest) {
   if (isProtectedRoute) {
     const userData = await validateUserSession();
     if (!userData) {
-      // Redirect unauthenticated users to login
       const redirectUrl = new URL("/login", request.url);
       redirectUrl.searchParams.set("from", pathname);
       return NextResponse.redirect(redirectUrl);
     }
 
-    // Add user info to headers for API routes
     const response = NextResponse.next();
     response.headers.set("x-user-id", userData.user.id);
     response.headers.set("x-user-email", userData.user.email);
     return response;
   }
 
-  // Default handling for unspecified routes
   return NextResponse.next();
 }
 
-// export const config = {
-//   matcher: [
-//     "/dashboard/:path*",
-//     "/profile/:path*",
-//     "/settings/:path*",
-//     "/r/:path*", // Match all routes under /r
-//     "/login",
-//     "/signup",
-//     "/forgot-password",
-//   ],
-// };
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/dashboard/:path*",
+    "/profile/:path*",
+    "/settings/:path*",
+    "/r/:path*",
+    "/login",
+    "/signup",
+    "/forgot-password",
+  ],
 };

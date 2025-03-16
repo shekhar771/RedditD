@@ -41,51 +41,51 @@ const Page = () => {
     },
   });
   return (
-    <AuthGuard requireAuth={true}>
-      <div className="  container flex items-center rounded-lg h-full max-w-3xl mx-auto ">
-        <div className=" bg-card relative  w-full h-fit p-4 rounded-lg space-y-6">
-          <div className=" bg-card flex justify-between items-center">
-            <h1 className="text-xl font-semibold">Create a subreddit</h1>
-          </div>
-          <hr></hr>
-          <div className="bg-card space-y-4">
-            <p>Name</p>
-            <div className="relative">
-              <p className="absolute px-3  text-zinc-800 left-0 inset-y-0 grid place-items-center ">
-                r/
-              </p>{" "}
-              <Input
-                className="pl-6 md: pl-7"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-            </div>
-            <div>Description</div>
+    // <AuthGuard requireAuth={true}>
+    <div className="  container flex items-center rounded-lg h-full max-w-3xl mx-auto ">
+      <div className=" bg-card relative  w-full h-fit p-4 rounded-lg space-y-6">
+        <div className=" bg-card flex justify-between items-center">
+          <h1 className="text-xl font-semibold">Create a subreddit</h1>
+        </div>
+        <hr></hr>
+        <div className="bg-card space-y-4">
+          <p>Name</p>
+          <div className="relative">
+            <p className="absolute px-3  text-zinc-800 left-0 inset-y-0 grid place-items-center ">
+              r/
+            </p>{" "}
             <Input
-              className=""
-              value={inputdes}
-              onChange={(e) => setInputdes(e.target.value)}
+              className="pl-6 md: pl-7"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
             />
-            <div className="flex gap-2 mx-2 my-3">
-              <Button
-                variant="outline"
-                // className="bg-destructive-foreground"
-                onClick={() => router.back()}
-              >
-                Cancel
-              </Button>
-              <Button
-                isLoading={isLoading}
-                disabled={input.length === 0}
-                onClick={() => submitData()}
-              >
-                Create a subreddit
-              </Button>
-            </div>
+          </div>
+          <div>Description</div>
+          <Input
+            className=""
+            value={inputdes}
+            onChange={(e) => setInputdes(e.target.value)}
+          />
+          <div className="flex gap-2 mx-2 my-3">
+            <Button
+              variant="outline"
+              // className="bg-destructive-foreground"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </Button>
+            <Button
+              isLoading={isLoading}
+              disabled={input.length === 0}
+              onClick={() => submitData()}
+            >
+              Create a subreddit
+            </Button>
           </div>
         </div>
       </div>
-    </AuthGuard>
+    </div>
+    // </AuthGuard>
   );
 };
 

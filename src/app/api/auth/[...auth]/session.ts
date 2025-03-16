@@ -64,7 +64,8 @@ export const validateSession = async (sessionToken: string) => {
 
 export const invalidateSession = async (sessionToken: string) => {
   try {
-    await prisma.session.delete({ where: { sessionToken: sessionToken } });
+    const sessionId = fromSessionTokenToSessionId(sessionToken);
+    await prisma.session.delete({ where: { id: sessionId } });
   } catch (error) {
     console.error("Error invalidating session:", error);
     throw new Error("Failed to invalidate session");
