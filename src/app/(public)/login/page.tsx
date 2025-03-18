@@ -25,7 +25,7 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login,loginWithGoogle , loginWithGithub } = useAuth();
+  const { login, loginWithGoogle, loginWithGithub } = useAuth();
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,7 +79,6 @@ export default function SignInPage() {
     setIsLoading(true);
     try {
       // Implement proper social auth flow
-      await signIn(provider, { callbackUrl: "/dashboard" });
     } catch (error) {
       toast({
         variant: "destructive",

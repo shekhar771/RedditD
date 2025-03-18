@@ -24,7 +24,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   loginWithGithub: () => Promise<void>;
-  loginWithGoogle: () => Promise<void>; // Added Google
+  loginWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
