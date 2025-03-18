@@ -1,4 +1,4 @@
-// app/api/validate-session/route.ts
+// app/api/auth/validate-session/route.ts
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { validateSession } from "@/app/api/auth/[...auth]/session";
