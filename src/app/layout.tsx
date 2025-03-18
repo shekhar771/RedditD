@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/app/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./components/AuthProvider";
 import React from "react";
+import Providers from "./components/Providers";
 
 
 export const metadata: Metadata = {
@@ -29,10 +30,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar />
-            {authModal}
-            {children}
-            <Toaster />
+            <Providers>
+              <Navbar />
+              {authModal}
+              {children}
+              <Toaster />
+            </Providers>
           </ThemeProvider>
         </AuthProvider>
 
