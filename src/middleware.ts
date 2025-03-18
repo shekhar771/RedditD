@@ -1,42 +1,36 @@
-// src/middleware.ts
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-// Define routes configuration
-const ROUTES = {
-  public: ["/", "/about", "/contact"],
-  auth: ["/login", "/signup", "/forgot-password"],
-  protected: ["/dashboard", "/profile", "/settings", "/r/", "/r/create"],
-  default: "/dashboard",
-};
+// middleware.ts
+import { NextRequest, NextResponse } from "next/server";
+import { getSessionToken } from "./app/api/auth/[...auth]/cookie";
 
 export async function middleware(request: NextRequest) {
-  const sessionToken = request.cookies.get("session")?.value;
-  const { pathname } = request.nextUrl;
+  // Define the protected routes
+  const protectedPaths = [
+    "/dashboard",
+    "/settings",
+    "/profile",
+    "/create-subreddit",
+    "/r",
+    "/r/create",
+    "/submit",
+  ];
+  ///---------------------------------------------------------------------------------------------------------
 
-  // Check if current path matches any route type
-  const isAuthRoute = ROUTES.auth.some((route) => pathname.startsWith(route));
-  const isPublicRoute = ROUTES.public.some((route) =>
-    pathname.startsWith(route)
-  );
-  const isProtectedRoute = ROUTES.protected.some((route) => {
-    if (pathname === route) return true;
-    if (
-      route.endsWith("/")
-        ? pathname.startsWith(route)
-        : pathname === route || pathname.startsWith(`${route}/`)
-    )
-      return true;
-    return false;
-  });
+  const authRoutes = ["/login", "/signup"];
 
-  // Function to validate session by calling the API route
-  const validateUserSession = async () => {
-    if (!sessionToken) return null;
+  // Get the path from the request
+  const path = request.nextUrl.pathname;
+  const isAuthRoute = authRoutes.some((route) => path === route);
 
+  const cookieStore = request.cookies;
+  const sessionToken = cookieStore.get("session")?.value;
+
+  // If user is logged in and trying to access auth routes, redirect to dashboard
+  if (isAuthRoute && sessionToken) {
     try {
+      // Validate the session token
+
       const response = await fetch(
-        `${request.nextUrl.origin}/api/auth/validate-session`,
+        new URL("/api/auth/validate-session", request.url),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -44,56 +38,78 @@ export async function middleware(request: NextRequest) {
         }
       );
 
-      if (!response.ok) return null;
-
-      const { session, user } = await response.json();
-      return { session, user };
+      if (response.ok) {
+        // User is logged in, redirect to dashboard
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      }
     } catch (error) {
-      console.error("Session validation error from middleware:", error);
-      return null;
+      console.error("Error validating session:", error);
+      // If validation fails, continue to auth page
     }
-  };
-
-  // Handle authentication routes (login, signup)
-  if (isAuthRoute) {
-    const userData = await validateUserSession();
-    if (userData) {
-      return NextResponse.redirect(new URL(ROUTES.default, request.url));
-    }
-    return NextResponse.next();
   }
 
-  // Handle public routes
-  if (isPublicRoute) {
-    return NextResponse.next();
-  }
+  ///---------------------------------------------------------------------------------------------------------
+  // Check if the path is protected
+  const isProtectedPath = protectedPaths.some(
+    (protectedPath) =>
+      path === protectedPath || path.startsWith(`${protectedPath}/`)
+  );
 
-  // Handle protected routes
-  if (isProtectedRoute) {
-    const userData = await validateUserSession();
-    if (!userData) {
-      const redirectUrl = new URL("/login", request.url);
-      redirectUrl.searchParams.set("from", pathname);
-      return NextResponse.redirect(redirectUrl);
+  if (isProtectedPath) {
+    // Get the session cookie
+    const cookieStore = request.cookies;
+    const sessionToken = cookieStore.get("session")?.value;
+
+    // If there's no session token, redirect to login
+    if (!sessionToken) {
+      const url = new URL("/login", request.url);
+      url.searchParams.set("redirect", path);
+      return NextResponse.redirect(url);
     }
 
-    const response = NextResponse.next();
-    response.headers.set("x-user-id", userData.user.id);
-    response.headers.set("x-user-email", userData.user.email);
-    return response;
+    // Optional: Validate the token on each request
+    // This adds some overhead but ensures session is still valid
+    try {
+      const response = await fetch(
+        new URL("/api/auth/validate-session", request.url),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionToken }),
+        }
+      );
+
+      if (!response.ok) {
+        const url = new URL("/login", request.url);
+        url.searchParams.set("redirect", path);
+        return NextResponse.redirect(url);
+      }
+    } catch (error) {
+      console.error("Error validating session:", error);
+      const url = new URL("/login", request.url);
+      url.searchParams.set("redirect", path);
+      return NextResponse.redirect(url);
+    }
   }
 
   return NextResponse.next();
 }
 
+// Configure the middleware to run only on specific paths
 export const config = {
   matcher: [
+    // Protected routes
     "/dashboard/:path*",
-    "/profile/:path*",
     "/settings/:path*",
-    "/r/:path*",
+    "/profile/:path*",
+    "/create-subreddit/:path*",
+    "/submit/:path*",
+    "/r/",
+    "/r/create",
     "/login",
     "/signup",
-    "/forgot-password",
+
+    // Exclude API routes from middleware
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

@@ -11,7 +11,9 @@
 
 # testing
 /coverage
+logfile
 /serverpos
+serverpos/logfile
 # next.js
 /.next/
 /out/

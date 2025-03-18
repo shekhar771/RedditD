@@ -23,7 +23,7 @@ import { useAuth } from "@/app/components/AuthProvider";
 import { AuthGuard } from "@/app/components/AuthGuard";
 
 export default function SignUpPage() {
-  const { loginWithGithub,loginWithGoogle, signup } = useAuth();
+  const { loginWithGithub, loginWithGoogle, signup } = useAuth();
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -40,7 +40,8 @@ export default function SignUpPage() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
-  };  const handleGoogleLogin = async () => {
+  };
+  const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
     } catch (error) {
@@ -103,116 +104,116 @@ export default function SignUpPage() {
   };
 
   return (
-    <AuthGuard requireAuth={false}>
-      <div className="grid w-full grow items-center px-4 sm:justify-center">
-        <Card className="w-full sm:w-96">
-          <CardHeader>
-            <CardTitle>Create your account</CardTitle>
-            <CardDescription>
-              Welcome! Please fill in the details to get started.
-            </CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="grid gap-y-4">
-              <div className="grid grid-cols-2 gap-x-4">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => handleGithubLogin()}
-                >
-                  {isLoading ? (
-                    <Icons.spinner className="size-4 animate-spin" />
-                  ) : (
-                    <>
-                      <Icons.gitHub className="mr-2 size-4" />
-                      GitHub
-                    </>
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => handleGoogleLogin()}
-                >
-                  {isLoading ? (
-                    <Icons.spinner className="size-4 animate-spin" />
-                  ) : (
-                    <>
-                      <Icons.google className="mr-2 size-4" />
-                      Google
-                    </>
-                  )}
-                </Button>
-              </div>
+    // <AuthGuard requireAuth={false}>
+    <div className="grid w-full grow items-center px-4 sm:justify-center">
+      <Card className="w-full sm:w-96">
+        <CardHeader>
+          <CardTitle>Create your account</CardTitle>
+          <CardDescription>
+            Welcome! Please fill in the details to get started.
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="grid gap-y-4">
+            <div className="grid grid-cols-2 gap-x-4">
+              <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                disabled={isLoading}
+                onClick={() => handleGithubLogin()}
+              >
+                {isLoading ? (
+                  <Icons.spinner className="size-4 animate-spin" />
+                ) : (
+                  <>
+                    <Icons.gitHub className="mr-2 size-4" />
+                    GitHub
+                  </>
+                )}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                disabled={isLoading}
+                onClick={() => handleGoogleLogin()}
+              >
+                {isLoading ? (
+                  <Icons.spinner className="size-4 animate-spin" />
+                ) : (
+                  <>
+                    <Icons.google className="mr-2 size-4" />
+                    Google
+                  </>
+                )}
+              </Button>
+            </div>
 
-              <p className="flex items-center gap-x-3 text-sm text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
-                or
-              </p>
+            <p className="flex items-center gap-x-3 text-sm text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
+              or
+            </p>
 
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </CardContent>
 
-            <CardFooter>
-              <div className="grid w-full gap-y-4">
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <Icons.spinner className="size-4 animate-spin" />
-                  ) : (
-                    "Sign up"
-                  )}
-                </Button>
-                <Button variant="link" size="sm" asChild>
-                  <Link href="/login">Already have an account? Sign in</Link>
-                </Button>
-              </div>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
-    </AuthGuard>
+          <CardFooter>
+            <div className="grid w-full gap-y-4">
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <Icons.spinner className="size-4 animate-spin" />
+                ) : (
+                  "Sign up"
+                )}
+              </Button>
+              <Button variant="link" size="sm" asChild>
+                <Link href="/login">Already have an account? Sign in</Link>
+              </Button>
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
+    // </AuthGuard>
   );
 }
