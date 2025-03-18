@@ -1,7 +1,6 @@
 "use client";
 
 import { AuthGuard } from "@/app/components/AuthGuard";
-
 import { useAuth } from "@/app/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,35 +16,34 @@ export default function DashboardPage() {
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
-
     }
   };
 
   return (
-    // <AuthGuard requireAuth={true}>
-    <div className="container mx-auto p-6">
-      <Card>
-        <CardHeader>
-          <div>array</div>
-          <CardTitle>Welcome to your Dashboard</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <p className="text-muted-foreground">Logged in as:</p>
-              <p className="font-medium">{user?.email}</p>
+    <AuthGuard requireAuth={true}>
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardHeader>
+            <div>array</div>
+            <CardTitle>Welcome to your Dashboard</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <p className="text-muted-foreground">Logged in as:</p>
+                <p className="font-medium">{user?.email}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Username:</p>
+                <p className="font-medium">{user?.username}</p>
+              </div>
+              <Button onClick={handleLogout} variant="outline">
+                Sign Out
+              </Button>
             </div>
-            <div>
-              <p className="text-muted-foreground">Username:</p>
-              <p className="font-medium">{user?.username}</p>
-            </div>
-            <Button onClick={handleLogout} variant="outline">
-              Sign Out
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-    // </AuthGuard>
+          </CardContent>
+        </Card>
+      </div>
+    </AuthGuard>
   );
 }

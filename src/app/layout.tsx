@@ -7,7 +7,6 @@ import { AuthProvider } from "./components/AuthProvider";
 import React from "react";
 import Providers from "./components/Providers";
 
-
 export const metadata: Metadata = {
   title: "Reddie",
   description: "Reddit clone with Next.js",
@@ -38,7 +37,6 @@ export default function RootLayout({
             </Providers>
           </ThemeProvider>
         </AuthProvider>
-
       </body>
     </html>
   );

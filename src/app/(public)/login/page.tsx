@@ -19,21 +19,18 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/AuthProvider";
 import { AuthGuard } from "@/app/components/AuthGuard";
 
-
 export default function SignInPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loginWithGoogle, loginWithGithub } = useAuth();
-
+  const { login,loginWithGoogle , loginWithGithub } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       await login(email, password);
-
 
       toast({
         title: "Success",
@@ -79,6 +76,7 @@ export default function SignInPage() {
     setIsLoading(true);
     try {
       // Implement proper social auth flow
+      await signIn(provider, { callbackUrl: "/dashboard" });
     } catch (error) {
       toast({
         variant: "destructive",

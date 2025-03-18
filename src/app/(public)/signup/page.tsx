@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +23,7 @@ import { useAuth } from "@/app/components/AuthProvider";
 import { AuthGuard } from "@/app/components/AuthGuard";
 
 export default function SignUpPage() {
-  const { loginWithGithub, loginWithGoogle, signup } = useAuth();
+  const { loginWithGithub,loginWithGoogle, signup } = useAuth();
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -39,8 +40,7 @@ export default function SignUpPage() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
-  };
-  const handleGoogleLogin = async () => {
+  };  const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
     } catch (error) {
@@ -89,6 +89,7 @@ export default function SignUpPage() {
   const handleSocialSignIn = (provider: string) => {
     try {
       setIsLoading(true);
+      signIn(provider, { callbackUrl: "/dashboard" });
     } catch (error) {
       toast({
         variant: "destructive",

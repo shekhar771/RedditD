@@ -15,7 +15,6 @@ export async function GET() {
 
     if (!session || !user) {
       return NextResponse.json({ error: "Invalid session" }, { status: 401 });
-
     }
 
     return NextResponse.json({
@@ -26,7 +25,6 @@ export async function GET() {
         name: user.name || null,
         image: user.image || null,
       },
-
     });
   } catch (error) {
     console.error("Session validation error:", error);
