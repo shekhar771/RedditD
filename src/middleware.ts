@@ -9,7 +9,6 @@ export async function middleware(request: NextRequest) {
     "/settings",
     "/profile",
     "/create-subreddit",
-    "/r",
     "/r/create",
     "/submit",
   ];
@@ -102,9 +101,7 @@ export const config = {
     "/dashboard/:path*",
     "/settings/:path*",
     "/profile/:path*",
-    "/create-subreddit/:path*",
     "/submit/:path*",
-    "/r/",
     "/r/create",
     "/login",
     "/signup",

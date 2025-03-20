@@ -1,0 +1,1 @@
+export const INFINTE_SCROLL_PAGINATION = 2;

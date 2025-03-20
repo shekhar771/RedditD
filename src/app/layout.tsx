@@ -32,7 +32,7 @@ export default function RootLayout({
             <Providers>
               <Navbar />
               {authModal}
-              {children}
+              <div className="m-2 ">{children}</div>
               <Toaster />
             </Providers>
           </ThemeProvider>

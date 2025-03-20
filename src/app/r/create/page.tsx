@@ -1,6 +1,6 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -24,19 +24,41 @@ const Page = () => {
 
       return data as string;
     },
-    onError: (error, data) => {
-      console.error("Failed to create subreddit:", error);
-      toast({
-        title: "failed ",
-        description: `error ${data}`,
-      });
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response?.status === 409) {
+        console.error("subreddit already exist");
+        toast({
+          variant: "destructive",
+
+          title: "failed ",
+          description: `subreddit already exist`,
+        });
+      } else if (
+        error instanceof AxiosError &&
+        error.response?.status === 422
+      ) {
+        console.error("subreddit name should be between 3 to 21 characters");
+        toast({
+          variant: "destructive",
+
+          title: "subreddit name should be between 3 to 21 characters ",
+        });
+      } else {
+        toast({
+          title: "failed ",
+          variant: "destructive",
+          description: `error ${error.response?.message}`,
+        });
+      }
       // alert("Failed to create subreddit. Please try again.");
     },
     onSuccess: (data) => {
       toast({
         title: "Success",
-        description: `r/${data} subreddit created successfully`,
+
+        description: `r/${data.name} subreddit created successfully`,
       });
+      router.push(`/r/${data.name}`);
       console.log("sucess to create subreddit:", data);
     },
   });
