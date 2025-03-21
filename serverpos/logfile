@@ -580,3 +580,51 @@
 2025-03-20 10:50:11.619 IST [22480] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.856 s, sync=0.019 s, total=0.916 s; sync files=8, longest=0.008 s, average=0.003 s; distance=5 kB, estimate=5 kB; lsn=0/8879F60, redo lsn=0/8879F08
 2025-03-20 11:02:45.687 IST [10732] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
 	
+2025-03-20 17:02:12.475 IST [22112] LOG:  received fast shutdown request
+2025-03-20 17:02:12.480 IST [6680] ERROR:  canceling statement due to user request
+2025-03-20 17:02:12.481 IST [22112] LOG:  aborting any active transactions
+2025-03-20 17:02:12.487 IST [25144] FATAL:  terminating connection due to administrator command
+2025-03-20 17:02:12.496 IST [22112] LOG:  background worker "logical replication launcher" (PID 6680) exited with exit code 1
+2025-03-20 17:02:12.505 IST [22480] LOG:  shutting down
+2025-03-20 17:02:12.513 IST [22480] LOG:  checkpoint starting: shutdown immediate
+2025-03-20 17:02:12.540 IST [22480] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.001 s, total=0.035 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=4 kB; lsn=0/887A028, redo lsn=0/887A028
+2025-03-20 17:02:12.558 IST [22112] LOG:  database system is shut down
+2025-03-20 17:02:42.284 IST [22716] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-03-20 17:02:42.292 IST [22716] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-20 17:02:42.293 IST [22716] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-20 17:02:42.433 IST [22288] LOG:  database system was shut down at 2025-03-20 17:02:12 IST
+2025-03-20 17:02:42.537 IST [22716] LOG:  database system is ready to accept connections
+2025-03-20 17:02:55.368 IST [23684] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-03-20 17:02:55.946 IST [2728] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-03-20 17:03:18.221 IST [18780] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-03-20 17:03:22.780 IST [22736] LOG:  checkpoint starting: immediate force wait
+2025-03-20 17:03:22.859 IST [22736] LOG:  checkpoint complete: wrote 16 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.033 s, sync=0.021 s, total=0.082 s; sync files=14, longest=0.006 s, average=0.002 s; distance=4894 kB, estimate=4894 kB; lsn=0/8D41A78, redo lsn=0/8D41A20
+2025-03-20 17:03:27.030 IST [22736] LOG:  checkpoint starting: immediate force wait
+2025-03-20 17:03:27.098 IST [22736] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.018 s, sync=0.010 s, total=0.069 s; sync files=7, longest=0.006 s, average=0.002 s; distance=4851 kB, estimate=4890 kB; lsn=0/91FE9E8, redo lsn=0/91FE990
+2025-03-20 17:03:48.847 IST [20052] ERROR:  table "_prisma_migrations" does not exist
+2025-03-20 17:03:48.847 IST [20052] STATEMENT:  DROP TABLE _prisma_migrations
+2025-03-20 17:03:52.280 IST [22736] LOG:  checkpoint starting: immediate force wait
+2025-03-20 17:03:52.554 IST [22736] LOG:  checkpoint complete: wrote 98 buffers (0.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.036 s, sync=0.165 s, total=0.275 s; sync files=102, longest=0.007 s, average=0.002 s; distance=5505 kB, estimate=5505 kB; lsn=0/975F0B8, redo lsn=0/975F060
+2025-03-20 17:03:55.840 IST [22736] LOG:  checkpoint starting: immediate force wait
+2025-03-20 17:03:55.883 IST [22736] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.010 s, sync=0.007 s, total=0.044 s; sync files=4, longest=0.005 s, average=0.002 s; distance=4844 kB, estimate=5439 kB; lsn=0/9C1A390, redo lsn=0/9C1A338
+2025-03-20 17:03:56.258 IST [20052] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-03-20 17:04:04.830 IST [17636] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-03-20 17:04:05.152 IST [18932] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-03-20 17:08:55.899 IST [22736] LOG:  checkpoint starting: time
+2025-03-20 17:09:03.920 IST [22736] LOG:  checkpoint complete: wrote 74 buffers (0.5%); 0 WAL file(s) added, 0 removed, 0 recycled; write=7.961 s, sync=0.029 s, total=8.022 s; sync files=29, longest=0.007 s, average=0.001 s; distance=299 kB, estimate=4925 kB; lsn=0/9C65230, redo lsn=0/9C651A0
+2025-03-20 19:23:58.011 IST [22736] LOG:  checkpoint starting: time
+2025-03-20 19:24:00.129 IST [22736] LOG:  checkpoint complete: wrote 20 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.074 s, sync=0.014 s, total=2.121 s; sync files=12, longest=0.006 s, average=0.002 s; distance=2 kB, estimate=4433 kB; lsn=0/9C65CB0, redo lsn=0/9C65C58
+2025-03-20 19:28:58.184 IST [22736] LOG:  checkpoint starting: time
+2025-03-20 19:28:59.538 IST [22736] LOG:  checkpoint complete: wrote 13 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.321 s, sync=0.012 s, total=1.355 s; sync files=9, longest=0.006 s, average=0.002 s; distance=1 kB, estimate=3990 kB; lsn=0/9C66390, redo lsn=0/9C66338
+2025-03-20 21:52:33.627 IST [22716] LOG:  server process (PID 25424) was terminated by exception 0xC000013A
+2025-03-20 21:52:33.627 IST [22716] DETAIL:  Failed process was running: SELECT "public"."Post"."id", "public"."Post"."title", "public"."Post"."content", "public"."Post"."createdAt", "public"."Post"."updatedAt", "public"."Post"."subredditId", "public"."Post"."authorId" FROM "public"."Post" WHERE "public"."Post"."subredditId" IN ($1) ORDER BY "public"."Post"."id" ASC OFFSET $2
+2025-03-20 21:52:33.627 IST [22716] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-03-20 21:52:33.629 IST [22716] LOG:  terminating any other active server processes
+2025-03-20 21:52:33.660 IST [22716] LOG:  received fast shutdown request
+^C

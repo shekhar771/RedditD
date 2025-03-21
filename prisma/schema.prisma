@@ -62,15 +62,17 @@ model User {
 // comments      Comment[]
 
 model Subreddit {
-  id          String         @id @default(cuid())
-  name        String         @unique
-  post        Post[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  creatorId   String?
-  Creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
-  Subscribers Subscription[]
-  description String?
+  id              String         @id @default(cuid())
+  name            String         @unique
+  post            Post[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  creatorId       String?
+  Creator         User?          @relation("CreatedBy", fields: [creatorId], references: [id])
+  Subscribers     Subscription[]
+  description     String?
+  image           String?
+  backgroundImage String?
 
   @@index([name])
 }

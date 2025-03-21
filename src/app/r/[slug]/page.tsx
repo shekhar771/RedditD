@@ -1,12 +1,15 @@
 import { AuthGuard } from "@/app/components/AuthGuard";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { toast } from "@/hooks/use-toast";
 import { prisma } from "@/lib/db";
+import { Search } from "lucide-react";
 import { notFound } from "next/navigation";
 import React, { FC } from "react";
 
 interface PageProps {
   params: {
     slug: string;
+    imageUrl?: string;
   };
 }
 
@@ -41,8 +44,21 @@ const page: FC<PageProps> = async ({ params }: PageProps) => {
 
   return (
     <AuthGuard>
-      <div className="flex flex-row  justify-between px-9 mx-5 items-center">
-        <div>image</div> <div className="text-3xl">{slug}</div>
+      <div className="flex flex-row  justify-between px-16 mx-5 items-center">
+        <div className="flex  gap-5 items-end">
+          <div className="relative ">
+            <Avatar className=" h-16 w-16">
+              {subreddit.image ? (
+                <AvatarImage src={subreddit.image} alt={subreddit.name} />
+              ) : (
+                <AvatarFallback className="h-16 w-16 text-3xl ">
+                  {subreddit.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              )}
+            </Avatar>
+          </div>{" "}
+          <div className="text-3xl">{slug}</div>
+        </div>
         <div className="flex  gap-5">
           <div>create post</div>
           <div>join</div>

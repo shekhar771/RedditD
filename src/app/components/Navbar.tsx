@@ -15,7 +15,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import { Input } from "@/components/ui/input";
+import { Icons } from "@/components/ui/icons";
+import { Search } from "lucide-react";
 const Navbar = () => {
   const { user, isLoading, logout } = useAuth();
 
@@ -53,10 +55,24 @@ const Navbar = () => {
 
   return (
     <nav className="flex h-[10vh] w-full items-center border-b px-7 justify-between mx-2 md:justify-between px-14 mb-3 bg">
-      <Link href="/">
-        <Image src={reddie} alt="reddit logo" className="h-14 w-full" />
+      <Link href="/" className="flex items-center">
+        <Image
+          src={reddie}
+          alt="reddit logo"
+          className="h-14 w-full min-w-fit"
+        />
+        <span className="hidden sm:block text-xl font-semibold ml-2">
+          Reddit
+        </span>
       </Link>
-      <div className="flex items-center gap-x-2">
+      <div className="flex  justify-center flex-1relative w-full">
+        <Input
+          placeholder="Search Reddit"
+          className="h-11 rounded-2xl px-4 sm: ml-4 max-w-[600px] "
+        />
+        <Search className="relative top-2 right-10" />
+      </div>
+      <div className="flex items-center gap-x-4">
         <ModeToggle />
 
         {isLoading ? (
