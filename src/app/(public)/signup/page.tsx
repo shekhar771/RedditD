@@ -20,7 +20,6 @@ import { toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/app/components/AuthProvider";
-import { AuthGuard } from "@/app/components/AuthGuard";
 
 export default function SignUpPage() {
   const { loginWithGithub, loginWithGoogle, signup } = useAuth();
@@ -104,7 +103,6 @@ export default function SignUpPage() {
   };
 
   return (
-    // <AuthGuard requireAuth={false}>
     <div className="grid w-full grow items-center px-4 sm:justify-center">
       <Card className="w-full sm:w-96">
         <CardHeader>
@@ -214,6 +212,5 @@ export default function SignUpPage() {
         </form>
       </Card>
     </div>
-    // </AuthGuard>
   );
 }

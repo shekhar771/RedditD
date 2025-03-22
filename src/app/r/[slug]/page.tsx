@@ -1,11 +1,12 @@
-import { AuthGuard } from "@/app/components/AuthGuard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 // import { toast } from "@/hooks/use-toast";
 import { prisma } from "@/lib/db";
-import { Search } from "lucide-react";
 import { notFound } from "next/navigation";
 import React, { FC } from "react";
-
+import { Plus } from "lucide-react";
+import Image from "next/image";
+import Formsubmit from "./test";
 interface PageProps {
   params: {
     slug: string;
@@ -43,29 +44,41 @@ const page: FC<PageProps> = async ({ params }: PageProps) => {
   }
 
   return (
-    <AuthGuard>
-      <div className="flex flex-row  justify-between px-16 mx-5 items-center">
-        <div className="flex  gap-5 items-end">
-          <div className="relative ">
-            <Avatar className=" h-16 w-16">
-              {subreddit.image ? (
-                <AvatarImage src={subreddit.image} alt={subreddit.name} />
-              ) : (
-                <AvatarFallback className="h-16 w-16 text-3xl ">
-                  {subreddit.name.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              )}
-            </Avatar>
-          </div>{" "}
-          <div className="text-3xl">{slug}</div>
-        </div>
-        <div className="flex  gap-5">
-          <div>create post</div>
-          <div>join</div>
-          <div>...option</div>
-        </div>
+    <div className="w-full md:w-9/12 mx-auto relative">
+      <div aria-label="background image" className="relative h-16 md:h-20">
+        {subreddit.backgroundImage ? (
+          <Image
+            className="md:rounded-2xl w-full"
+            src={subreddit.backgroundImage}
+            alt={subreddit.name}
+          />
+        ) : (
+          <div className="w-full h-16 bg-gray-800 md:rounded-2xl md:h-20" />
+        )}
       </div>
-    </AuthGuard>
+
+      <div className="top-[0.5rem] relative md:absolute md:top-[2.5rem] left-5">
+        <Avatar className="h-16 w-16 md:h-20 md:w-20 border-4 border-white shadow-lg">
+          {subreddit.image ? (
+            <AvatarImage src={subreddit.image} alt={subreddit.name} />
+          ) : (
+            <AvatarFallback className="text-3xl md:text-5xl bg-orange-500">
+              {subreddit.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          )}
+        </Avatar>
+      </div>
+
+      <div className="ml-24 -mt-12  flex flex-col md:flex-row  md:mt-1 md:justify-between md:items-center">
+        <div className="ml-7">
+          <h1 className="text-4xl md:text-4xl font-bold">r/{slug}</h1>
+          <div className="md:hidden ">10k member</div>
+        </div>
+
+        <Formsubmit />
+        <br />
+      </div>
+    </div>
   );
 };
 

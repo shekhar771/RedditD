@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { createSubredditPayload } from "@/lib/validator/subreddit";
 import { toast } from "@/hooks/use-toast";
-import { AuthGuard } from "@/app/components/AuthGuard";
 const Page = () => {
   const router = useRouter();
   const [input, setInput] = useState<string>("");
@@ -63,7 +62,6 @@ const Page = () => {
     },
   });
   return (
-    // <AuthGuard requireAuth={true}>
     <div className="  container flex items-center rounded-lg h-full max-w-3xl mx-auto ">
       <div className=" bg-card relative  w-full h-fit p-4 rounded-lg space-y-6">
         <div className=" bg-card flex justify-between items-center">
@@ -107,7 +105,6 @@ const Page = () => {
         </div>
       </div>
     </div>
-    // </AuthGuard>
   );
 };
 
