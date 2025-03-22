@@ -3,6 +3,8 @@
 import Link from "next/link";
 import React from "react";
 import reddie from "../../../public/reddie-logo.svg";
+import reddie1 from "../../../public/reddie1.svg";
+
 import Image from "next/image";
 import { ModeToggle } from "./ThemeButton";
 import { Button } from "@/components/ui/button";
@@ -54,10 +56,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex h-[10vh] w-full items-center border-b px-7 justify-between mx-2 md:justify-between px-14 mb-3 bg">
+    <nav className="flex h-[10vh] w-full items-center border-b  shadow-md pl-0 pr-5 justify-between mx-2 sm:justify-between px-14 mb-3  transition-all duration-300 hover:shadow-lg">
       <Link href="/" className="flex items-center">
         <Image
-          src={reddie}
+          src={reddie1}
           alt="reddit logo"
           className="h-14 w-full min-w-fit"
         />

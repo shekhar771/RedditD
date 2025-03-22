@@ -627,4 +627,31 @@
 2025-03-20 21:52:33.627 IST [22716] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
 2025-03-20 21:52:33.629 IST [22716] LOG:  terminating any other active server processes
 2025-03-20 21:52:33.660 IST [22716] LOG:  received fast shutdown request
-^C
+^C2025-03-21 10:08:54.586 IST [4628] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-03-21 10:08:54.650 IST [4628] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-21 10:08:54.650 IST [4628] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-21 10:08:54.822 IST [4772] LOG:  database system was interrupted; last known up at 2025-03-20 19:28:59 IST
+2025-03-21 10:09:04.838 IST [4772] LOG:  syncing data directory (fsync), elapsed time: 10.01 s, current path: ./global/2676
+2025-03-21 10:09:05.245 IST [4772] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-03-21 10:09:05.266 IST [4772] LOG:  redo starts at 0/9C66338
+2025-03-21 10:09:05.266 IST [4772] LOG:  invalid record length at 0/9C66440: expected at least 24, got 0
+2025-03-21 10:09:05.266 IST [4772] LOG:  redo done at 0/9C66408 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-03-21 10:09:05.290 IST [17072] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-03-21 10:09:05.369 IST [17072] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.026 s, sync=0.018 s, total=0.091 s; sync files=2, longest=0.010 s, average=0.009 s; distance=0 kB, estimate=0 kB; lsn=0/9C66440, redo lsn=0/9C66440
+2025-03-21 10:09:05.454 IST [4628] LOG:  database system is ready to accept connections
+2025-03-21 18:19:05.334 IST [4628] LOG:  server process (PID 28288) was terminated by exception 0xC000013A
+2025-03-21 18:19:05.334 IST [4628] DETAIL:  Failed process was running: SELECT "public"."User"."id", "public"."User"."name", "public"."User"."username", "public"."User"."email", "public"."User"."emailVerified", "public"."User"."passwordHash", "public"."User"."image" FROM "public"."User" WHERE "public"."User"."id" IN ($1) OFFSET $2
+2025-03-21 18:19:05.334 IST [4628] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-03-21 18:19:05.335 IST [4628] LOG:  terminating any other active server processes
+2025-03-21 18:19:05.373 IST [4628] LOG:  received fast shutdown request
+^C2025-03-22 11:48:09.100 IST [27108] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-03-22 11:48:09.114 IST [27108] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-22 11:48:09.114 IST [27108] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-22 11:48:09.288 IST [28372] LOG:  database system was interrupted; last known up at 2025-03-21 10:09:05 IST
+2025-03-22 11:48:17.893 IST [28372] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-03-22 11:48:17.909 IST [28372] LOG:  redo starts at 0/9C664B8
+2025-03-22 11:48:17.909 IST [28372] LOG:  invalid record length at 0/9C664F0: expected at least 24, got 0
+2025-03-22 11:48:17.909 IST [28372] LOG:  redo done at 0/9C664B8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-03-22 11:48:17.928 IST [22656] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-03-22 11:48:18.001 IST [22656] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.027 s, sync=0.014 s, total=0.083 s; sync files=2, longest=0.008 s, average=0.007 s; distance=0 kB, estimate=0 kB; lsn=0/9C664F0, redo lsn=0/9C664F0
+2025-03-22 11:48:18.067 IST [27108] LOG:  database system is ready to accept connections
