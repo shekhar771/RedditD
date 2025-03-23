@@ -7,6 +7,7 @@ import React, { FC } from "react";
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import Formsubmit from "./test";
+import { getServerSession } from "@/lib/server-auth";
 interface PageProps {
   params: {
     slug: string;
@@ -17,6 +18,7 @@ interface PageProps {
 const page: FC<PageProps> = async ({ params }: PageProps) => {
   //   const slug = useParams();
   const { slug } = await params;
+  const { user, session } = await getServerSession();
 
   const subreddit = await prisma.subreddit.findFirst({
     where: {

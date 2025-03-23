@@ -56,7 +56,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex h-[8vh] w-full items-center border-b  shadow-md pl-0 pr-5 justify-between mx-2 sm:justify-between sm:h-[10vh] px-14 mb-0.5  transition-all duration-300 hover:shadow-lg">
+    <nav className="flex h-[8vh] w-full items-center border-b  shadow-md pl-0 pr-5 justify-between mx-2 sm:justify-between sm:h-[9vh] px-14 mb-0.5  transition-all duration-300 hover:shadow-lg">
       <Link href="/" className="flex items-center">
         <Image
           src={reddie1}
