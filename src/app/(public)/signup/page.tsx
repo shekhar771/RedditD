@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -89,7 +88,7 @@ export default function SignUpPage() {
   const handleSocialSignIn = (provider: string) => {
     try {
       setIsLoading(true);
-      signIn(provider, { callbackUrl: "/dashboard" });
+      // signIn(provider, { callbackUrl: "/dashboard" });
     } catch (error) {
       toast({
         variant: "destructive",

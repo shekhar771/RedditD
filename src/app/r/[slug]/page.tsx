@@ -6,8 +6,8 @@ import React, { FC } from "react";
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import Formsubmit from "./test";
-import { getServerSession } from "@/lib/server-auth";
 import SubredditSidebar from "./sidebar";
+import { getServerSession } from "@/lib/server-auth";
 
 interface PageProps {
   params: {
@@ -33,12 +33,37 @@ const page: FC<PageProps> = async ({ params }: PageProps) => {
           Vote: true,
         },
         take: 2,
+        orderBy: {
+          createdAt: "desc",
+        },
       },
+      Creator: true, // Include the creator
     },
   });
 
   if (!subreddit) {
     return notFound();
+  }
+
+  // Get subscriber count
+  const subscriberCount = await prisma.subscription.count({
+    where: {
+      subredditId: subreddit.id,
+    },
+  });
+
+  // Check if current user is subscribed
+  let isSubscribed = false;
+  if (user) {
+    const subscription = await prisma.subscription.findUnique({
+      where: {
+        UserId_subredditId: {
+          UserId: user.id,
+          subredditId: subreddit.id,
+        },
+      },
+    });
+    isSubscribed = !!subscription;
   }
 
   return (
@@ -71,10 +96,14 @@ const page: FC<PageProps> = async ({ params }: PageProps) => {
       <div className="ml-24 -mt-12 flex flex-col md:flex-row md:mt-1 md:justify-between md:items-center">
         <div className="ml-7">
           <h1 className="text-4xl md:text-4xl font-bold">r/{slug}</h1>
-          <div className="md:hidden">{subreddit.members || 10000} members</div>
+          <div className="md:hidden">{subscriberCount} members</div>
         </div>
 
-        <Formsubmit />
+        <Formsubmit
+          subredditName={subreddit.name}
+          subredditId={subreddit.id}
+          isSubscribed={isSubscribed}
+        />
       </div>
 
       {/* Main content with sidebar layout */}
@@ -89,12 +118,23 @@ const page: FC<PageProps> = async ({ params }: PageProps) => {
                   key={post.id}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
                 >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs text-gray-500">
+                      Posted by u/{post.author.username || post.author.name}
+                    </span>
+                  </div>
                   <h2 className="text-xl font-semibold">{post.title}</h2>
                   <p className="mt-2 text-gray-600 dark:text-gray-300">
-                    {/* {post.content} */}
-                    check
+                    {typeof post.content === "string"
+                      ? post.content
+                      : post.content
+                      ? JSON.stringify(post.content)
+                      : ""}
                   </p>
-                  {/* Add more post details as needed */}
+                  <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
+                    <span>{post.Vote?.length || 0} votes</span>
+                    <span>{post.comment?.length || 0} comments</span>
+                  </div>
                 </div>
               ))
             ) : (
@@ -111,7 +151,10 @@ const page: FC<PageProps> = async ({ params }: PageProps) => {
 
         {/* Sidebar */}
         <div className="w-full md:w-1/3 mt-4 md:mt-0">
-          <SubredditSidebar subreddit={subreddit} />
+          <SubredditSidebar
+            subreddit={subreddit}
+            subscriberCount={subscriberCount}
+          />
         </div>
       </div>
     </div>

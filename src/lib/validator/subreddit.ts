@@ -10,4 +10,4 @@ export const subredditsubscriber = z.object({
 });
 
 export type createSubredditPayload = z.infer<typeof subredditSchema>;
-export type subreddutsubscribberPayload = z.infer<typeof subredditsubscriber>;
+export type subredditsubscribberPayload = z.infer<typeof subredditsubscriber>;

@@ -9,10 +9,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Users, Info, Flag, Calendar } from "lucide-react";
+import { Calendar, Users, Info, Shield } from "lucide-react";
 import { formatDistance } from "date-fns";
 
-const SubredditSidebar = ({ subreddit }) => {
+const SubredditSidebar = ({ subreddit, subscriberCount }) => {
   // Format date for display
   const formattedDate = subreddit.createdAt
     ? formatDistance(new Date(subreddit.createdAt), new Date(), {
@@ -38,10 +38,8 @@ const SubredditSidebar = ({ subreddit }) => {
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-gray-500" />
             <div>
-              <p className="font-medium">{subreddit.members || 0} members</p>
-              <p className="text-xs text-gray-500">
-                {subreddit.activeMembers || 0} online now
-              </p>
+              <p className="font-medium">{subscriberCount || 0} members</p>
+              <p className="text-xs text-gray-500">Created {formattedDate}</p>
             </div>
           </div>
 
@@ -49,20 +47,6 @@ const SubredditSidebar = ({ subreddit }) => {
             <Calendar className="h-5 w-5 text-gray-500" />
             <p className="text-sm">Created {formattedDate}</p>
           </div>
-
-          {subreddit.rules && subreddit.rules.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium mb-2">Community Rules</h3>
-              <ul className="text-sm space-y-2">
-                {subreddit.rules.map((rule, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="font-medium">{index + 1}.</span>
-                    <span>{rule}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </CardContent>
         <CardFooter>
           <Button className="w-full" variant="outline">
@@ -71,34 +55,27 @@ const SubredditSidebar = ({ subreddit }) => {
         </CardFooter>
       </Card>
 
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Moderators</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-sm">
-            {subreddit.moderators ? (
-              <ul className="space-y-1">
-                {subreddit.moderators.map((mod, index) => (
-                  <li
-                    key={index}
-                    className="text-blue-500 hover:underline cursor-pointer"
-                  >
-                    u/{mod}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No moderators available</p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button className="w-full" variant="ghost" size="sm">
-            View All Moderators
-          </Button>
-        </CardFooter>
-      </Card>
+      {subreddit.Creator && (
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Moderation</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium">Created by</p>
+                <p className="text-sm text-blue-500 hover:underline cursor-pointer">
+                  u/
+                  {subreddit.Creator.username ||
+                    subreddit.Creator.name ||
+                    "unknown"}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
