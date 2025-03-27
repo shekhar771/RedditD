@@ -1,6 +1,5 @@
 "use client";
 
-import { AuthGuard } from "@/app/components/AuthGuard";
 import { useAuth } from "@/app/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,6 @@ export default function DashboardPage() {
   };
 
   return (
-    // <AuthGuard requireAuth={true}>
     <div className="container mx-auto p-6">
       <Card>
         <CardHeader>
@@ -44,6 +42,5 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
     </div>
-    // </AuthGuard>
   );
 }

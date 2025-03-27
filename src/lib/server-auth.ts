@@ -46,12 +46,6 @@ export async function validateAuthForApi() {
   return { user, session };
 }
 
-// Get the auth user without redirecting
-export async function getAuthUser(): Promise<AuthUser | null> {
-  const { user } = await getServerSession();
-  return user;
-}
-
 // For API routes - protected route handler wrapper
 export function withAuth(
   handler: (req: NextRequest, user: AuthUser) => Promise<NextResponse>
@@ -76,25 +70,6 @@ export function withAuth(
         { error: "Internal Server Error" },
         { status: 500 }
       );
-    }
-  };
-}
-
-// Server actions wrapper
-export function withAuthAction<T, A extends any[]>(
-  action: (user: AuthUser, ...args: A) => Promise<T>
-) {
-  return async (...args: A): Promise<T | { error: string }> => {
-    try {
-      const { user } = await validateAuthForApi();
-      return await action(user, ...args);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Server Action Error:", error);
-        return { error: error.message || "An error occurred" };
-      }
-      console.error("Unknown Error:", error);
-      return { error: "An error occurred" };
     }
   };
 }

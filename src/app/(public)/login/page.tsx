@@ -17,7 +17,6 @@ import { Icons } from "@/components/ui/icons";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/AuthProvider";
-import { AuthGuard } from "@/app/components/AuthGuard";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -90,7 +89,6 @@ export default function SignInPage() {
   };
 
   return (
-    // <AuthGuard requireAuth={false}>
     <div className="grid w-full grow items-center px-4 sm:justify-center">
       <Card className="w-full max-w-sm">
         <CardHeader>
@@ -180,6 +178,5 @@ export default function SignInPage() {
         </CardFooter>
       </Card>
     </div>
-    // </AuthGuard>
   );
 }
