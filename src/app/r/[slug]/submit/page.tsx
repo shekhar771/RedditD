@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tab";
 import { prisma } from "@/lib/db";
 import { Ghost } from "lucide-react";
+import { notFound } from "next/navigation";
 import React from "react";
 
 interface PageProps {
@@ -24,15 +25,22 @@ const tabs = [
 const page = async ({ params }: PageProps) => {
   const handleTabChange = (tabId: string) => {
     console.log("Selected tab:", tabId);
-    // Add logic to handle tab changes
   };
   const { slug } = await params;
+  const onsubmit = async (data: any) => {
+    try {
+      console.log("Form Data:", data);
+    } catch (error) {}
+  };
 
   const subreddit = await prisma.subreddit.findFirst({
     where: {
       name: slug,
     },
   });
+  if (!subreddit) {
+    return notFound();
+  }
   return (
     <div className="container mx-auto w-full sm:w-4/6 mt-5">
       <div className="flex justify-between mt-1 items-center">
@@ -53,11 +61,11 @@ const page = async ({ params }: PageProps) => {
         </Avatar>
         <h3 className=" text-xl  font-bold  ">r/{slug}</h3>
       </div>
-      <PostAddNav />
+      <PostAddNav subredditId={subreddit.id} />
       <div className="flex items-center gap-2  mt-4 justify-end ">
         <Button variant="ghost">Draft</Button>
 
-        <Button>submit</Button>
+        <Button type="submit">submit</Button>
       </div>
     </div>
   );

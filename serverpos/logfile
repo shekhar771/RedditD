@@ -781,3 +781,30 @@
 2025-03-27 17:19:33.040 IST [20924] LOG:  database system is ready to accept connections
 2025-03-27 17:24:32.445 IST [21412] LOG:  checkpoint starting: time
 2025-03-27 17:24:34.083 IST [21412] LOG:  checkpoint complete: wrote 17 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.561 s, sync=0.032 s, total=1.644 s; sync files=16, longest=0.009 s, average=0.002 s; distance=6 kB, estimate=6 kB; lsn=0/9C69D08, redo lsn=0/9C69CB0
+2025-03-27 19:28:35.552 IST [12724] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-03-27 19:28:35.557 IST [14476] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-03-28 02:43:46.476 IST [20924] LOG:  server process (PID 24892) was terminated by exception 0x40010004
+2025-03-28 02:43:46.476 IST [20924] DETAIL:  Failed process was running: SELECT "public"."Subreddit"."id", "public"."Subreddit"."name", "public"."Subreddit"."createdAt", "public"."Subreddit"."updatedAt", "public"."Subreddit"."creatorId", "public"."Subreddit"."description", "public"."Subreddit"."image", "public"."Subreddit"."backgroundImage" FROM "public"."Subreddit" WHERE "public"."Subreddit"."name" = $1 LIMIT $2 OFFSET $3
+2025-03-28 02:43:46.476 IST [20924] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-03-28 02:43:46.477 IST [20924] LOG:  terminating any other active server processes
+2025-03-28 02:43:46.624 IST [20924] LOG:  all server processes terminated; reinitializing
+2025-03-28 02:43:47.098 IST [20924] LOG:  startup process (PID 25352) was terminated by exception 0xC0000142
+2025-03-28 02:43:47.098 IST [20924] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-03-28 02:43:47.098 IST [20924] LOG:  aborting startup due to startup process failure
+2025-03-28 02:43:47.105 IST [20924] LOG:  database system is shut down
+2025-03-28 02:54:58.874 IST [6080] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by msvc-19.42.34435, 64-bit
+2025-03-28 02:54:59.011 IST [6080] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-28 02:54:59.012 IST [6080] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-28 02:54:59.396 IST [10732] LOG:  database system was interrupted; last known up at 2025-03-27 17:24:34 IST
+2025-03-28 02:55:09.425 IST [10732] LOG:  syncing data directory (fsync), elapsed time: 10.01 s, current path: ./base/4/14897_vm
+2025-03-28 02:55:14.304 IST [10732] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-03-28 02:55:14.324 IST [10732] LOG:  redo starts at 0/9C69CB0
+2025-03-28 02:55:14.324 IST [10732] LOG:  invalid record length at 0/9C69DB8: expected at least 24, got 0
+2025-03-28 02:55:14.324 IST [10732] LOG:  redo done at 0/9C69D80 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-03-28 02:55:14.345 IST [6700] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-03-28 02:55:14.411 IST [6700] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.023 s, sync=0.014 s, total=0.076 s; sync files=2, longest=0.008 s, average=0.007 s; distance=0 kB, estimate=0 kB; lsn=0/9C69DB8, redo lsn=0/9C69DB8
+2025-03-28 02:55:14.561 IST [6080] LOG:  database system is ready to accept connections
+2025-03-28 03:03:27.840 IST [15396] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	

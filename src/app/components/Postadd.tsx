@@ -3,9 +3,15 @@
 import { Input } from "@/components/ui/input";
 import { Tabs } from "@/components/ui/tab";
 import { Textarea } from "@/components/ui/textarea";
-import React, { useState } from "react";
+import { PostSchema } from "@/lib/validator/PostAdd";
+import React, { FC, useState } from "react";
+import { useForm } from "react-hook-form";
 
-interface PageProps {}
+import { zodResolver } from "@hookform/resolvers/zod";
+import { title } from "process";
+interface PageProps {
+  subredditId: string;
+}
 
 const tabs = [
   { id: "Text", label: "Text" },
@@ -14,8 +20,19 @@ const tabs = [
   { id: "Link", label: "Link" },
 ];
 
-const PostAddNav = () => {
+const PostAddNav: FC<PageProps> = ({ subredditId }) => {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
+
+  const onSubmit = (data: any) => {};
+  const {} = useForm({
+    resolver: zodResolver(PostSchema),
+    defaultValues: {
+      contentType: "Text",
+      subredditId: subredditId,
+      title: "",
+      content: null,
+    },
+  });
 
   const renderTabContent = () => {
     switch (activeTab) {
