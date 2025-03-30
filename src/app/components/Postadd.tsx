@@ -101,7 +101,7 @@ const PostCreationTabs = () => {
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <div className="w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Create a Post</CardTitle>
         <CardDescription>
@@ -173,9 +173,11 @@ const PostCreationTabs = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Create Image Post
-                </Button>
+                <div className="flex items-center gap-2  mt-4 justify-end ">
+                  <Button variant="ghost">Draft</Button>
+
+                  <Button type="submit">submit</Button>
+                </div>
               </form>
             </Form>
           </TabsContent>
@@ -216,9 +218,11 @@ const PostCreationTabs = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Create Link Post
-                </Button>
+                <div className="flex items-center gap-2  mt-4 justify-end ">
+                  <Button variant="ghost">Draft</Button>
+
+                  <Button type="submit">submit</Button>
+                </div>
               </form>
             </Form>
           </TabsContent>
@@ -263,15 +267,18 @@ const PostCreationTabs = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Create Text Post
-                </Button>
+
+                <div className="flex items-center gap-2  mt-4 justify-end ">
+                  <Button variant="ghost">Draft</Button>
+
+                  <Button type="submit">submit</Button>
+                </div>
               </form>
             </Form>
           </TabsContent>
         </Tabs>
       </CardContent>
-    </Card>
+    </div>
   );
 };
 
