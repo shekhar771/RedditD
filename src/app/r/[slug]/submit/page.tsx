@@ -1,4 +1,4 @@
-import PostAddNav from "@/app/components/Postadd";
+import PostCreationTabs from "@/app/components/Postadd";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tab";
@@ -61,7 +61,7 @@ const page = async ({ params }: PageProps) => {
         </Avatar>
         <h3 className=" text-xl  font-bold  ">r/{slug}</h3>
       </div>
-      <PostAddNav subredditId={subreddit.id} />
+      <PostCreationTabs subredditId={subreddit.id} />
     </div>
   );
 };
