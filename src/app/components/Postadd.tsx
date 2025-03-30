@@ -56,7 +56,7 @@ const PostAddNav: FC<PageProps> = ({ subredditId }) => {
         text: "",
         link: "",
         description: "",
-        imageFile: "",
+        imageFile: undefined,
       },
     };
 
