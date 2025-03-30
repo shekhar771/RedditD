@@ -1,115 +1,55 @@
 "use client";
 
 import * as React from "react";
-import { useState, useRef, useEffect } from "react";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
+
 import { cn } from "@/lib/utils";
 
-interface Tab {
-  id: string;
-  label: string;
-}
+const Tabs = TabsPrimitive.Root;
 
-interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
-  tabs: Tab[];
-  activeTab?: string;
-  onTabChange?: (tabId: string) => void;
-}
-const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
-  ({ className, tabs, activeTab, onTabChange, ...props }, ref) => {
-    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [hoverStyle, setHoverStyle] = useState({});
-    const [activeStyle, setActiveStyle] = useState({
-      left: "0px",
-      width: "0px",
-    });
-    const tabRefs = useRef<(HTMLDivElement | null)[]>([]);
+const TabsList = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.List
+    ref={ref}
+    className={cn(
+      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      className
+    )}
+    {...props}
+  />
+));
+TabsList.displayName = TabsPrimitive.List.displayName;
 
-    useEffect(() => {
-      if (hoveredIndex !== null) {
-        const hoveredElement = tabRefs.current[hoveredIndex];
-        if (hoveredElement) {
-          const { offsetLeft, offsetWidth } = hoveredElement;
-          setHoverStyle({
-            left: `${offsetLeft}px`,
-            width: `${offsetWidth}px`,
-          });
-        }
-      }
-    }, [hoveredIndex]);
+const TabsTrigger = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+      className
+    )}
+    {...props}
+  />
+));
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-    useEffect(() => {
-      const activeElement = tabRefs.current[activeIndex];
-      if (activeElement) {
-        const { offsetLeft, offsetWidth } = activeElement;
-        setActiveStyle({
-          left: `${offsetLeft}px`,
-          width: `${offsetWidth}px`,
-        });
-      }
-    }, [activeIndex]);
+const TabsContent = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Content
+    ref={ref}
+    className={cn(
+      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      className
+    )}
+    {...props}
+  />
+));
+TabsContent.displayName = TabsPrimitive.Content.displayName;
 
-    useEffect(() => {
-      requestAnimationFrame(() => {
-        const firstElement = tabRefs.current[0];
-        if (firstElement) {
-          const { offsetLeft, offsetWidth } = firstElement;
-          setActiveStyle({
-            left: `${offsetLeft}px`,
-            width: `${offsetWidth}px`,
-          });
-        }
-      });
-    }, []);
-
-    return (
-      <div ref={ref} className={cn("relative", className)} {...props}>
-        <div className="relative">
-          {/* Hover Highlight */}
-          <div
-            className="absolute h-[30px] transition-all duration-300 ease-out bg-[#0e0f1114] dark:bg-[#ffffff1a] rounded-[6px] flex items-center"
-            style={{
-              ...hoverStyle,
-              opacity: hoveredIndex !== null ? 1 : 0,
-            }}
-          />
-
-          {/* Active Indicator */}
-          <div
-            className="absolute gap-3 bottom-[-6px] h-[2px] bg-[#0e0f11] dark:bg-white transition-all duration-300 ease-out"
-            style={activeStyle}
-          />
-
-          {/* Tabs */}
-          <div className="relative flex space-x-[8px] gap-3 items-center">
-            {tabs.map((tab, index) => (
-              <div
-                key={tab.id}
-                ref={(el) => (tabRefs.current[index] = el)}
-                className={cn(
-                  "px-3 py-2 cursor-pointer transition-colors duration-300 h-[30px]",
-                  index === activeIndex
-                    ? "text-[#0e0e10] dark:text-white"
-                    : "text-[#0e0f1199] dark:text-[#ffffff99]"
-                )}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => {
-                  setActiveIndex(index);
-                  onTabChange?.(tab.id);
-                }}
-              >
-                <div className="text-sm font-medium gap-2 leading-5 whitespace-nowrap flex items-center justify-center h-full">
-                  {tab.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-);
-Tabs.displayName = "Tabs";
-
-export { Tabs };
+export { Tabs, TabsList, TabsTrigger, TabsContent };

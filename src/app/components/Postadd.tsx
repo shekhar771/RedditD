@@ -1,275 +1,278 @@
 "use client";
 
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tab";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { PostSchema } from "@/lib/validator/PostAdd";
-import React, { FC, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Tabs } from "@/components/ui/tab";
-interface PageProps {
-  subredditId: string;
-}
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
-const tabs = [
-  { id: "Text", label: "Text" },
-  { id: "Images", label: "Images" },
-  { id: "Link", label: "Link" },
-];
+// Schema for image posts
+const imagePostSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  imageUrl: z.string().url("Please enter a valid image URL"),
+  description: z.string().optional(),
+});
 
-type FormData = z.infer<typeof PostSchema>;
+// Schema for link posts
+const linkPostSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  link: z.string().url("Please enter a valid URL"),
+});
 
-const PostAddNav: FC<PageProps> = ({ subredditId }) => {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(PostSchema),
+// Schema for text posts
+const textPostSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+});
+
+const PostCreationTabs = () => {
+  const [activeTab, setActiveTab] = React.useState("image");
+
+  // Image post form
+  const imageForm = useForm<z.infer<typeof imagePostSchema>>({
+    resolver: zodResolver(imagePostSchema),
     defaultValues: {
-      contentType: "Text",
-      subredditId: subredditId,
       title: "",
-      content: {
-        text: "",
-        link: "",
-        description: "",
-        imageFile: undefined,
-      },
+      imageUrl: "",
+      description: "",
     },
   });
 
-  const contentType = watch("contentType");
+  // Link post form
+  const linkForm = useForm<z.infer<typeof linkPostSchema>>({
+    resolver: zodResolver(linkPostSchema),
+    defaultValues: {
+      title: "",
+      link: "",
+    },
+  });
 
-  // Reset content when tab changes
-  useEffect(() => {
-    const resetValues = {
-      title: watch("title"),
-      subredditId,
-      contentType,
-      content: {
-        text: "",
-        link: "",
-        description: "",
-        imageFile: undefined,
-      },
-    };
+  // Text post form
+  const textForm = useForm<z.infer<typeof textPostSchema>>({
+    resolver: zodResolver(textPostSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
+  });
 
-    if (contentType === "Text") {
-      resetValues.content.text = watch("content.text") || "";
-    } else if (contentType === "Images") {
-      resetValues.content.imageFile = watch("content.imageFile");
-      resetValues.content.description = watch("content.description") || "";
-    } else if (contentType === "Link") {
-      resetValues.content.link = watch("content.link") || "";
-      resetValues.content.description = watch("content.description") || "";
-    }
-
-    reset(resetValues);
-  }, [contentType, reset, subredditId, watch]);
-
-  const onSubmit = (data: FormData) => {
-    console.log("Form submitted:", data);
-
-    // Prepare data for submission based on content type
-    const submissionData = {
-      title: data.title,
-      subredditId: data.subredditId,
-      contentType: data.contentType,
-      content: {} as any,
-    };
-
-    if (data.contentType === "Text") {
-      submissionData.content.text = data.content.text;
-    } else if (data.contentType === "Images") {
-      submissionData.content.imageFile = data.content.imageFile;
-      submissionData.content.description = data.content.description || "";
-    } else if (data.contentType === "Link") {
-      submissionData.content.link = data.content.link;
-      submissionData.content.description = data.content.description || "";
-    }
-
-    console.log("Submission data:", submissionData);
-    // Handle form submission with submissionData
+  // Submit handlers for each form type
+  const onImageSubmit = (data: z.infer<typeof imagePostSchema>) => {
+    console.log("Image post data:", data);
+    // Add your API call or state update here
+    imageForm.reset();
   };
 
-  const handleTabChange = (tabId: string) => {
-    setValue("contentType", tabId as "Text" | "Images" | "Link");
+  const onLinkSubmit = (data: z.infer<typeof linkPostSchema>) => {
+    console.log("Link post data:", data);
+    // Add your API call or state update here
+    linkForm.reset();
   };
 
-  const renderTabContent = () => {
-    switch (contentType) {
-      case "Text":
-        return (
-          <div className="mt-4">
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <Input placeholder="Title" className="mb-1" {...field} />
-                  {errors.title && (
-                    <p className="text-red-500 text-sm mb-2">
-                      {errors.title.message}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-            <Controller
-              name="content.text"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <Textarea
-                    placeholder="Write your post..."
-                    className="min-h-[200px]"
-                    {...field}
-                  />
-                  {errors.content?.text && (
-                    <p className="text-red-500 text-sm">
-                      {errors.content.text.message}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-          </div>
-        );
-      case "Images":
-        return (
-          <div className="mt-4">
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <Input placeholder="Title" className="mb-1" {...field} />
-                  {errors.title && (
-                    <p className="text-red-500 text-sm mb-2">
-                      {errors.title.message}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-            <Controller
-              name="content.imageFile"
-              control={control}
-              render={({ field: { value, onChange, ...field } }) => (
-                <div className="mb-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      onChange(e.target.files?.[0] || null);
-                    }}
-                    {...field}
-                  />
-                  {errors.content?.imageFile && (
-                    <p className="text-red-500 text-sm">
-                      {errors.content.imageFile.message as string}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-            <Controller
-              name="content.description"
-              control={control}
-              render={({ field }) => (
-                <Textarea
-                  placeholder="Optional description..."
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              )}
-            />
-          </div>
-        );
-      case "Link":
-        return (
-          <div className="mt-4">
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <Input placeholder="Title" className="mb-1" {...field} />
-                  {errors.title && (
-                    <p className="text-red-500 text-sm mb-2">
-                      {errors.title.message}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-            <Controller
-              name="content.link"
-              control={control}
-              render={({ field }) => (
-                <div className="mb-4">
-                  <Input
-                    placeholder="Paste your link here"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                  {errors.content?.link && (
-                    <p className="text-red-500 text-sm">
-                      {errors.content.link.message}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-            <Controller
-              name="content.description"
-              control={control}
-              render={({ field }) => (
-                <Textarea
-                  placeholder="Optional description..."
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              )}
-            />
-          </div>
-        );
-      default:
-        return null;
-    }
+  const onTextSubmit = (data: z.infer<typeof textPostSchema>) => {
+    console.log("Text post data:", data);
+    // Add your API call or state update here
+    textForm.reset();
   };
 
   return (
-    <div>
-      <Tabs
-        className="mt-2"
-        tabs={tabs}
-        onTabChange={handleTabChange}
-        activeTab={contentType}
-      />
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {renderTabContent()}
-        <div className="flex items-center gap-2 mt-4 justify-end">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => {
-              console.log("Saved as draft");
-            }}
-          >
-            Draft
-          </Button>
-          <Button type="submit">Submit</Button>
-        </div>
-      </form>
-    </div>
+    <Card className="w-full max-w-2xl">
+      <CardHeader>
+        <CardTitle>Create a Post</CardTitle>
+        <CardDescription>
+          Choose the type of post you want to create
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs
+          defaultValue="image"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="image">Image</TabsTrigger>
+            <TabsTrigger value="link">Link</TabsTrigger>
+            <TabsTrigger value="text">Text</TabsTrigger>
+          </TabsList>
+
+          {/* Image Post Form */}
+          <TabsContent value="image">
+            <Form {...imageForm}>
+              <form
+                onSubmit={imageForm.handleSubmit(onImageSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={imageForm.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Add a title for your image post"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={imageForm.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter image URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={imageForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description (optional)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Add a description for your image"
+                          className="resize-none h-24"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Create Image Post
+                </Button>
+              </form>
+            </Form>
+          </TabsContent>
+
+          {/* Link Post Form */}
+          <TabsContent value="link">
+            <Form {...linkForm}>
+              <form
+                onSubmit={linkForm.handleSubmit(onLinkSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={linkForm.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Add a title for your link"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={linkForm.control}
+                  name="link"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Link URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter link URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Create Link Post
+                </Button>
+              </form>
+            </Form>
+          </TabsContent>
+
+          {/* Text Post Form */}
+          <TabsContent value="text">
+            <Form {...textForm}>
+              <form
+                onSubmit={textForm.handleSubmit(onTextSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={textForm.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Add a title for your text post"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={textForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Text Content</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Write your post content here"
+                          className="resize-none h-32"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Create Text Post
+                </Button>
+              </form>
+            </Form>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 
-export default PostAddNav;
+export default PostCreationTabs;
