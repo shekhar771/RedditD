@@ -9,6 +9,7 @@ import { Tabs } from "@/components/ui/tab";
 import { Button } from "@/components/ui/button"; // Assuming you have a Button component
 
 import { PostSchema } from "@/lib/validator/PostAdd"; // Adjust the import path as necessary
+import RedditEditor from "@/components/ui/Editor";
 
 const tabs = [
   { id: "Text", label: "Text" },

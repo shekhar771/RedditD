@@ -62,11 +62,6 @@ const page = async ({ params }: PageProps) => {
         <h3 className=" text-xl  font-bold  ">r/{slug}</h3>
       </div>
       <PostAddNav subredditId={subreddit.id} />
-      <div className="flex items-center gap-2  mt-4 justify-end ">
-        <Button variant="ghost">Draft</Button>
-
-        <Button type="submit">submit</Button>
-      </div>
     </div>
   );
 };
