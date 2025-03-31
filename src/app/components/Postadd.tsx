@@ -4,6 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
 import {
   Tabs,
   TabsContent,
@@ -262,6 +263,7 @@ const PostCreationTabs = () => {
                           className="resize-none h-32"
                           {...field}
                         />
+                        // rich text editor to be added
                       </FormControl>
                       <FormMessage />
                     </FormItem>
