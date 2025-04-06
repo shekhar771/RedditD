@@ -45,6 +45,17 @@ const Formsubmit: FC<PageProps> = ({
           title: "You are not logged in",
           // description: ``,
         });
+      } else if (
+        error instanceof AxiosError &&
+        error.response?.status === 400
+      ) {
+        console.error("not logged in");
+        toast({
+          variant: "destructive",
+
+          title: "Admin cannot unsubscribe from their own subreddit ",
+          // description: ``,
+        });
       } else {
         toast({
           title: "There was problem ",
