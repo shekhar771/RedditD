@@ -4,13 +4,13 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "../../components/ui/tab";
+
 import {
   Card,
   CardContent,
@@ -31,6 +31,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import Link from "@tiptap/extension-link";
+
+import { UploadButton } from "@/lib/uploadthing";
+import { Editor } from "./Editor";
+import { Editor2 } from "@/components/ui/Toolbar";
 
 // Schema for image posts
 const imagePostSchema = z.object({
@@ -52,7 +57,7 @@ const textPostSchema = z.object({
 });
 
 const PostCreationTabs = () => {
-  const [activeTab, setActiveTab] = React.useState("image");
+  const [activeTab, setActiveTab] = React.useState("text");
 
   // Image post form
   const imageForm = useForm<z.infer<typeof imagePostSchema>>({
@@ -161,17 +166,18 @@ const PostCreationTabs = () => {
                   control={imageForm.control}
                   name="description"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description (optional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Add a description for your image"
-                          className="resize-none h-24"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                    <Editor />
+                    // <FormItem>
+                    //   <FormLabel>Description (optional)</FormLabel>
+                    //   <FormControl>
+                    //     <Textarea
+                    //       placeholder="Add a description for your image"
+                    //       className="resize-none h-24"
+                    //       {...field}
+                    //     />
+                    //   </FormControl>
+                    //   <FormMessage />
+                    // </FormItem>
                   )}
                 />
                 <div className="flex items-center gap-2  mt-4 justify-end ">
@@ -256,14 +262,10 @@ const PostCreationTabs = () => {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Text Content</FormLabel>
+                      <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Write your post content here"
-                          className="resize-none h-32"
-                          {...field}
-                        />
-                        // rich text editor to be added
+                        <Editor />
+                        {/* <Editor2 /> */}
                       </FormControl>
                       <FormMessage />
                     </FormItem>

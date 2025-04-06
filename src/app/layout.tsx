@@ -7,6 +7,10 @@ import { AuthProvider } from "./components/AuthProvider";
 import React from "react";
 import Providers from "./components/Providers";
 
+// import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+// import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "./api/uploadthing/core";
+
 export const metadata: Metadata = {
   title: "Reddie",
   description: "Reddit clone with Next.js",
@@ -30,6 +34,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Providers>
+              {/* <NextSSRPlugin
+                
+                routerConfig={extractRouterConfig(ourFileRouter)}
+              /> */}
               <Navbar />
               {authModal}
               <div className="">{children}</div>

@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+// import { withUt } from "uploadthing/tw";
 
 export default {
   darkMode: ["class"],
@@ -10,6 +11,11 @@ export default {
   theme: {
     container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
     extend: {
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic":
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

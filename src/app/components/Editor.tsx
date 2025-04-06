@@ -1,176 +1,559 @@
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { $createParagraphNode, $getRoot } from "lexical";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { CodeHighlightNode, CodeNode } from "@lexical/code";
-import { AutoLinkNode, LinkNode } from "@lexical/link";
-import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
-import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  useEditor,
+  type Editor as TiptapEditor,
+  EditorContent,
+  JSONContent,
+} from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+import Superscript from "@tiptap/extension-superscript";
+import Subscript from "@tiptap/extension-subscript";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import Placeholder from "@tiptap/extension-placeholder";
 
-import ToolbarPlugin from "./plugins/ToolbarPlugin";
-import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
-import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
-import ReadOnlyPlugin from "./plugins/ReadOnlyPlugin";
-import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
-import OnChangeMarkdown from "./plugins/OnChangeMarkdown";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useState } from "react";
 
-function Placeholder() {
-  return <div className="editor-placeholder">Enter some rich text...</div>;
-}
-const exampleTheme = {
-  ltr: "ltr",
-  rtl: "rtl",
-  placeholder: "editor-placeholder",
-  paragraph: "editor-paragraph",
-  quote: "editor-quote",
-  heading: {
-    h1: "editor-heading-h1",
-    h2: "editor-heading-h2",
-    h3: "editor-heading-h3",
-    h4: "editor-heading-h4",
-    h5: "editor-heading-h5",
-  },
-  list: {
-    nested: {
-      listitem: "editor-nested-listitem",
-    },
-    ol: "editor-list-ol",
-    ul: "editor-list-ul",
-    listitem: "editor-listitem",
-  },
-  image: "editor-image",
-  link: "editor-link",
-  text: {
-    bold: "editor-text-bold",
-    italic: "editor-text-italic",
-    overflowed: "editor-text-overflowed",
-    hashtag: "editor-text-hashtag",
-    underline: "editor-text-underline",
-    strikethrough: "editor-text-strikethrough",
-    underlineStrikethrough: "editor-text-underlineStrikethrough",
-    code: "editor-text-code",
-  },
-  code: "editor-code",
-  codeHighlight: {
-    atrule: "editor-tokenAttr",
-    attr: "editor-tokenAttr",
-    boolean: "editor-tokenProperty",
-    builtin: "editor-tokenSelector",
-    cdata: "editor-tokenComment",
-    char: "editor-tokenSelector",
-    class: "editor-tokenFunction",
-    "class-name": "editor-tokenFunction",
-    comment: "editor-tokenComment",
-    constant: "editor-tokenProperty",
-    deleted: "editor-tokenProperty",
-    doctype: "editor-tokenComment",
-    entity: "editor-tokenOperator",
-    function: "editor-tokenFunction",
-    important: "editor-tokenVariable",
-    inserted: "editor-tokenSelector",
-    keyword: "editor-tokenAttr",
-    namespace: "editor-tokenVariable",
-    number: "editor-tokenProperty",
-    operator: "editor-tokenOperator",
-    prolog: "editor-tokenComment",
-    property: "editor-tokenProperty",
-    punctuation: "editor-tokenPunctuation",
-    regex: "editor-tokenVariable",
-    selector: "editor-tokenSelector",
-    string: "editor-tokenSelector",
-    symbol: "editor-tokenProperty",
-    tag: "editor-tokenProperty",
-    url: "editor-tokenOperator",
-    variable: "editor-tokenVariable",
-  },
-};
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createLowlight } from "lowlight";
+import javascript from "highlight.js/lib/languages/javascript";
 
-const editorConfig = {
-  // The editor theme
-  theme: exampleTheme,
-  // Handling of errors during update
-  onError(error) {
-    throw error;
-  },
-  // Any custom nodes go here
-  nodes: [
-    HeadingNode,
-    ListNode,
-    ListItemNode,
-    QuoteNode,
-    CodeNode,
-    CodeHighlightNode,
-    TableNode,
-    TableCellNode,
-    TableRowNode,
-    AutoLinkNode,
-    LinkNode,
-  ],
-};
+const lowlight = createLowlight({
+  javascript,
+});
 
-export default function Editor(props) {
+// Custom Spoiler Extension
+import { Node, mergeAttributes } from "@tiptap/core";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+// const SpoilerExtension = Node.create({
+//   name: "spoiler",
+//   group: "block",
+//   content: "inline*",
+//   parseHTML() {
+//     return [
+//       {
+//         tag: "div[data-spoiler]",
+//       },
+//     ];
+//   },
+//   renderHTML({ HTMLAttributes }) {
+//     return [
+//       "div",
+//       mergeAttributes(HTMLAttributes, {
+//         "data-spoiler": "",
+//         class:
+//           "bg-gray-200 dark:bg-gray-700 p-4 rounded-md cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors",
+//         "data-spoiler-visible": "false",
+//         onClick:
+//           "this.setAttribute('data-spoiler-visible', this.getAttribute('data-spoiler-visible') === 'true' ? 'false' : 'true')",
+//       }),
+//       0,
+//     ];
+//   },
+//   addCommands() {
+//     return {
+//       setSpoiler:
+//         () =>
+//         ({ commands }) => {
+//           return commands.wrapIn(this.name);
+//         },
+//     };
+//   },
+// });
+
+export const Menubar = ({ editor }: { editor: TiptapEditor | null }) => {
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+
+  if (!editor) {
+    return null;
+  }
+
+  const setLink = () => {
+    if (linkUrl) {
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: linkUrl })
+        .run();
+    } else {
+      editor.chain().focus().unsetLink().run();
+    }
+    setIsLinkDialogOpen(false);
+    setLinkUrl("");
+  };
+
+  const buttonVariant = (isActive: boolean) =>
+    isActive ? "default" : "outline";
+
   return (
-    <LexicalComposer initialConfig={editorConfig}>
-      <div className="editor-container">
-        <ToolbarPlugin />
-        <div className="editor-inner">
-          <RichTextPlugin
-            initialEditorState={() => {
-              let str = (props.value || "").replace(/\n\n<br>\n/g, "\n");
+    <TooltipProvider>
+      <div className="flex flex-wrap gap-2 mt-5 p-1 ">
+        <div className="flex gap-[0.1rem] mr-[0.3rem] ">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() =>
+                  editor.chain().focus().toggleHeading({ level: 1 }).run()
+                }
+                variant={buttonVariant(
+                  editor.isActive("heading", { level: 1 })
+                )}
+                aria-label="Heading 1"
+              >
+                H1
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Heading 1</TooltipContent>
+          </Tooltip>
 
-              // If we still have br tags, we're coming from Slate, apply
-              // Slate list collapse and remove remaining br tags
-              // https://github.com/facebook/lexical/issues/2208
-              if (str.match(/<br>/g)) {
-                str = str
-                  .replace(/^(\n)(?=\s*[-+\d.])/gm, "")
-                  .replace(/<br>/g, "");
-              }
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                variant={buttonVariant(editor.isActive("bold"))}
+                aria-label="Bold"
+              >
+                B
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Bold</TooltipContent>
+          </Tooltip>
 
-              str = str
-                // Unescape HTML characters
-                .replace(/&quot;/g, '"')
-                .replace(/&amp;/g, "&")
-                .replace(/&#39;/g, "'")
-                .replace(/&lt;/g, "<")
-                .replace(/&gt;/g, ">");
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleItalic().run()}
+                variant={buttonVariant(editor.isActive("italic"))}
+                aria-label="Italic"
+              >
+                I
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Italic</TooltipContent>
+          </Tooltip>
 
-              if (!str) {
-                // if string is empty and this is not an update
-                // don't bother trying to $convertFromMarkdown
-                // below we properly initialize with the correct state allowing for
-                // AutoFocus to work (as there is state to focus on), which works better
-                // than $convertFromMarkdownString('')
-                const root = $getRoot();
-                const paragraph = $createParagraphNode();
-                root.append(paragraph);
-                return;
-              }
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleStrike().run()}
+                variant={buttonVariant(editor.isActive("strike"))}
+                aria-label="Strike"
+              >
+                S
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Strike</TooltipContent>
+          </Tooltip>
 
-              $convertFromMarkdownString(str, TRANSFORMERS);
-            }}
-            contentEditable={<ContentEditable className="editor-input" />}
-            placeholder={<Placeholder />}
-          />
-
-          <HistoryPlugin />
-
-          <CodeHighlightPlugin />
-          <ListPlugin />
-          <LinkPlugin />
-          <OnChangeMarkdown onChange={props.onChange} />
-          <ReadOnlyPlugin isDisabled={props.isDisabled} />
-          <AutoLinkPlugin />
-          <ListMaxIndentLevelPlugin maxDepth={7} />
-          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleCode().run()}
+                variant={buttonVariant(editor.isActive("code"))}
+                aria-label="Inline Code"
+              >
+                <span className="font-mono">{"<>"}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Inline Code</TooltipContent>
+          </Tooltip>
         </div>
+
+        <div className="flex gap-[0.1rem] mr-[0.3rem]">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleSuperscript().run()}
+                variant={buttonVariant(editor.isActive("superscript"))}
+                aria-label="Superscript"
+              >
+                x²
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Superscript</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleSubscript().run()}
+                variant={buttonVariant(editor.isActive("subscript"))}
+                aria-label="Subscript"
+              >
+                x₂
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Subscript</TooltipContent>
+          </Tooltip>
+        </div>
+
+        <div className="flex gap-[0.1rem] mr-[0.3rem]">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleBulletList().run()}
+                variant={buttonVariant(editor.isActive("bulletList"))}
+                aria-label="Bullet List"
+              >
+                • List
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Bullet List</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                variant={buttonVariant(editor.isActive("orderedList"))}
+                aria-label="Numbered List"
+              >
+                1. List
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Numbered List</TooltipContent>
+          </Tooltip>
+        </div>
+
+        <div className="flex gap-[0.1rem] mr-[0.3rem]">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                variant={buttonVariant(editor.isActive("codeBlock"))}
+                aria-label="Code Block"
+              >
+                {"</>"}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Code Block</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                variant={buttonVariant(editor.isActive("blockquote"))}
+                aria-label="Quote Block"
+              >
+                Quote Block
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Quote Block</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => {
+                  // Check if link is active
+                  if (editor.isActive("link")) {
+                    // If active, unset the link
+                    editor.chain().focus().unsetLink().run();
+                  } else {
+                    // Open the dialog to add a link
+                    setIsLinkDialogOpen(true);
+                  }
+                }}
+                variant={buttonVariant(editor.isActive("link"))}
+                aria-label="Insert Link"
+              >
+                Link
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Insert Link</TooltipContent>
+          </Tooltip>
+        </div>
+
+        {/* <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => editor.chain().focus().setHorizontalRule().run()}
+              variant="outline"
+              aria-label="Horizontal Rule"
+            >
+              HR
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Horizontal Rule</TooltipContent>
+        </Tooltip> */}
       </div>
-    </LexicalComposer>
+
+      {/* Link Dialog */}
+      <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Insert Link</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="url" className="mb-2">
+              URL
+            </Label>
+            <Input
+              id="url"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="https://example.com"
+              className="mt-1"
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsLinkDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={setLink}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </TooltipProvider>
+  );
+};
+
+export function Editor({
+  onChange,
+  initialContent = "",
+}: {
+  onChange?: (json: JSONContent) => void;
+  initialContent?: string | JSONContent;
+}) {
+  const [editorReady, setEditorReady] = useState(false);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        // Make sure lists are properly configured in StarterKit
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false, // don't keep attributes when toggling lists
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false, // don't keep attributes when toggling lists
+        },
+      }),
+      Placeholder.configure({
+        // Use a placeholder:
+        placeholder: "Write something …",
+      }),
+      Link.configure({
+        openOnClick: true,
+        autolink: true,
+        defaultProtocol: "https",
+        protocols: ["http", "https"],
+        HTMLAttributes: {
+          // Add styling to links so they're clearly visible
+          class: "text-blue-600 underline hover:text-blue-800",
+        },
+        // Keep the link validation logic
+        isAllowedUri: (url, ctx) => {
+          try {
+            // construct URL
+            const parsedUrl = url.includes(":")
+              ? new URL(url)
+              : new URL(`${ctx.defaultProtocol}://${url}`);
+
+            // use default validation
+            if (!ctx.defaultValidate(parsedUrl.href)) {
+              return false;
+            }
+
+            // disallowed protocols
+            const disallowedProtocols = ["ftp", "file", "mailto"];
+            const protocol = parsedUrl.protocol.replace(":", "");
+
+            if (disallowedProtocols.includes(protocol)) {
+              return false;
+            }
+
+            // only allow protocols specified in ctx.protocols
+            const allowedProtocols = ctx.protocols.map((p) =>
+              typeof p === "string" ? p : p.scheme
+            );
+
+            if (!allowedProtocols.includes(protocol)) {
+              return false;
+            }
+
+            // disallowed domains
+            const disallowedDomains = [
+              "example-phishing.com",
+              "malicious-site.net",
+            ];
+            const domain = parsedUrl.hostname;
+
+            if (disallowedDomains.includes(domain)) {
+              return false;
+            }
+
+            // all checks have passed
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        shouldAutoLink: (url) => {
+          try {
+            // construct URL
+            const parsedUrl = url.includes(":")
+              ? new URL(url)
+              : new URL(`https://${url}`);
+
+            // only auto-link if the domain is not in the disallowed list
+            const disallowedDomains = [
+              "example-no-autolink.com",
+              "another-no-autolink.com",
+            ];
+            const domain = parsedUrl.hostname;
+
+            return !disallowedDomains.includes(domain);
+          } catch {
+            return false;
+          }
+        },
+      }),
+      Superscript,
+      Subscript,
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
+      // SpoilerExtension,
+    ],
+    content: initialContent,
+    editorProps: {
+      attributes: {
+        class: "prose dark:prose-invert focus:outline-none max-w-none",
+      },
+    },
+    onUpdate: ({ editor }) => {
+      const json = editor.getJSON();
+      if (onChange) {
+        onChange(json);
+      }
+    },
+    onTransaction: () => {
+      // Ensure the editor exists before trying to get its JSON
+      if (!editorReady && editor) {
+        setEditorReady(true);
+      }
+    },
+  });
+
+  return (
+    <div className="editor-wrapper">
+      <Menubar editor={editor} />
+      <EditorContent
+        editor={editor}
+        className="rounded-lg border p-4 min-h-[200px] mt-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all"
+      />
+      <style jsx global>{`
+        .ProseMirror {
+          min-height: 150px;
+          padding: 0.5rem;
+        }
+        .ProseMirror:focus {
+          outline: none;
+        }
+        .ProseMirror code {
+          background-color: rgba(97, 97, 97, 0.1);
+          border-radius: 3px;
+          padding: 0.2em 0.4em;
+        }
+        .ProseMirror pre {
+          background: #0d0d0d;
+          color: #fff;
+          font-family: "JetBrainsMono", monospace;
+          padding: 0.75rem 1rem;
+          border-radius: 0.5rem;
+        }
+        .ProseMirror pre code {
+          color: inherit;
+          padding: 0;
+          background: none;
+          font-size: 0.8rem;
+        }
+        .ProseMirror blockquote {
+          padding-left: 1rem;
+          border-left: 3px solid #e2e8f0;
+        }
+        .ProseMirror a {
+          color: #2563eb;
+          text-decoration: underline;
+        }
+        .ProseMirror a:hover {
+          color: #1d4ed8;
+        }
+        /* List styling */
+        .ProseMirror ul {
+          list-style-type: disc;
+          padding-left: 1.5rem;
+        }
+        .ProseMirror ol {
+          list-style-type: decimal;
+          padding-left: 1.5rem;
+        }
+        [data-spoiler] {
+          position: relative;
+        }
+        [data-spoiler][data-spoiler-visible="false"]::after {
+          content: "Click to reveal spoiler";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: rgba(75, 85, 99, 0.8);
+          color: white;
+        }
+      `}</style>
+    </div>
   );
 }
