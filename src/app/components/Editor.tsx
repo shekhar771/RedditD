@@ -464,6 +464,8 @@ export function Editor({
       }),
       // SpoilerExtension,
     ],
+    immediatelyRender: false,
+
     content: initialContent,
     editorProps: {
       attributes: {

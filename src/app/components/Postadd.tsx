@@ -33,9 +33,11 @@ import {
 } from "@/components/ui/form";
 import Link from "@tiptap/extension-link";
 
-import { UploadButton } from "@/lib/uploadthing";
+import { UploadButton, UploadDropzone } from "@uploadthing/react";
 import { Editor } from "./Editor";
 import { Editor2 } from "@/components/ui/Toolbar";
+import { error } from "console";
+import UploadComponent from "./UploadButton";
 
 // Schema for image posts
 const imagePostSchema = z.object({
@@ -156,7 +158,7 @@ const PostCreationTabs = () => {
                     <FormItem>
                       <FormLabel>Image URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter image URL" {...field} />
+                        <UploadComponent />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -166,18 +168,13 @@ const PostCreationTabs = () => {
                   control={imageForm.control}
                   name="description"
                   render={({ field }) => (
-                    <Editor />
-                    // <FormItem>
-                    //   <FormLabel>Description (optional)</FormLabel>
-                    //   <FormControl>
-                    //     <Textarea
-                    //       placeholder="Add a description for your image"
-                    //       className="resize-none h-24"
-                    //       {...field}
-                    //     />
-                    //   </FormControl>
-                    //   <FormMessage />
-                    // </FormItem>
+                    <FormItem>
+                      <FormLabel>Description (optional)</FormLabel>
+                      <FormControl>
+                        <Editor />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
                 <div className="flex items-center gap-2  mt-4 justify-end ">
