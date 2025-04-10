@@ -156,7 +156,7 @@ const PostCreationTabs = () => {
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
+                      <FormLabel>Image Upload</FormLabel>
                       <FormControl>
                         <UploadComponent />
                       </FormControl>

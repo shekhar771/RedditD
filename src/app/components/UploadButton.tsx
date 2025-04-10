@@ -34,8 +34,8 @@ export default function UploadComponent() {
       {isUploading && <p>Uploading...</p>}
 
       {uploadedUrl && (
-        <div className="mt-4">
-          <p>Uploaded image:</p>
+        <div className="mt-2">
+          {/* <p>Uploaded image:</p> */}
           <Image
             src={uploadedUrl}
             alt="Uploaded"
