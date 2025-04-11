@@ -10,6 +10,7 @@ export default function UploadComponent() {
   return (
     <div className="flex flex-col items-center gap-4">
       <UploadButton<OurFileRouter, "imageUploader">
+        className='border'
         endpoint="imageUploader"
         onUploadBegin={() => setIsUploading(true)}
         onClientUploadComplete={(res) => {

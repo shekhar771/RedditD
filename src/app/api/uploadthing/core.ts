@@ -11,14 +11,14 @@ export const ourFileRouter = {
     // Set permissions and file types for this FileRoute
     .middleware(async () => {
       // This code runs on your server before upload
-      // const user = getServerSession(); // Replace with actual auth
+      const user = getServerSession(); // Replace with actual auth
 
       // If you throw, the user will not be able to upload
       // if (!user) throw new Error("Unauthorized");
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
-      // return { userId: user.id };
-      return { userId: "testing" };
+      return { userId: (await user).user?.id };
+      // return { userId: "testing" };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       // This code RUNS ON YOUR SERVER after upload

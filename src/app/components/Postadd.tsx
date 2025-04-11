@@ -38,6 +38,7 @@ import { Editor } from "./Editor";
 import { Editor2 } from "@/components/ui/Toolbar";
 import { error } from "console";
 import UploadComponent from "./UploadButton";
+import LinkPreviewComponent from "./LinkPreview";
 
 // Schema for image posts
 const imagePostSchema = z.object({
@@ -216,7 +217,13 @@ const PostCreationTabs = () => {
                     <FormItem>
                       <FormLabel>Link URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter link URL" {...field} />
+                        <LinkPreviewComponent
+                          value={field.value}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          disabled={field.disabled}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
