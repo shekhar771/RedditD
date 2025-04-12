@@ -125,14 +125,13 @@ export default function LinkPreviewComponent({
                     <img
                       src={preview.image}
                       alt="Link preview"
-                      className="object-cover w-full h-full transition-opacity duration-300"
-                      loading="lazy"
-                      onLoad={(e) => {
-                        (e.target as HTMLImageElement).classList.add(
-                          "opacity-100"
-                        );
+                      className="object-cover w-full h-full"
+                      onError={(e) => {
+                        // Hide the image container if loading fails
+                        (
+                          e.target as HTMLImageElement
+                        ).parentElement?.classList.add("hidden");
                       }}
-                      style={{ opacity: 0 }}
                     />
                   </div>
                 )}

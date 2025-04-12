@@ -1,11 +1,10 @@
-// app/api/link/route.ts (using Next.js App Router)
+// app/api/link/route.ts
 import { NextResponse } from 'next/server'
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 import { LinkSchema, LinkPreviewSchema } from '@/lib/validator/link'
 import { z } from 'zod'
 
-LinkSchema
 export async function POST (request: Request) {
   try {
     // Parse and validate the request body
@@ -16,7 +15,8 @@ export async function POST (request: Request) {
     const response = await axios.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; LinkPreviewBot/1.0)'
-      }
+      },
+      timeout: 10000 // 10 seconds timeout
     })
 
     const html = response.data
@@ -33,7 +33,47 @@ export async function POST (request: Request) {
       $('meta[name="description"]').attr('content') ||
       ''
 
-    const image = $('meta[property="og:image"]').attr('content') || ''
+    // Extract image with fallbacks
+    let image =
+      $('meta[property="og:image"]').attr('content') ||
+      $('meta[property="twitter:image"]').attr('content') ||
+      ''
+
+    // Fix relative image URLs
+    if (image && !image.startsWith('http') && !image.startsWith('data:')) {
+      if (image && !image.startsWith('http') && !image.startsWith('data:')) {
+        try {
+          // Parse the base URL
+          const baseUrl = new URL(url)
+
+          // Handle different relative path formats
+          if (image.startsWith('//')) {
+            image = `${baseUrl.protocol}${image}`
+          } else if (image.startsWith('/')) {
+            image = `${baseUrl.origin}${image}`
+          } else {
+            // For other relative paths
+            const basePath = baseUrl.pathname.split('/').slice(0, -1).join('/')
+            image = `${baseUrl.origin}${basePath}/${image}`
+          }
+        } catch (error) {
+          console.error('Error fixing relative image URL:', error)
+        }
+      }
+    }
+
+    // Validate the image URL is accessible (optional but helpful)
+    if (image) {
+      try {
+        const imgResponse = await axios.head(image, { timeout: 3000 })
+        if (imgResponse.status !== 200) {
+          image = '' // Clear invalid image
+        }
+      } catch (error) {
+        console.error('Image validation failed:', error)
+        image = '' // Clear inaccessible image
+      }
+    }
 
     // Validate and return the preview data
     const preview = LinkPreviewSchema.parse({

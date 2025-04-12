@@ -159,7 +159,11 @@ const PostCreationTabs = () => {
                     <FormItem>
                       <FormLabel>Image Upload</FormLabel>
                       <FormControl>
-                        <UploadComponent />
+                        <UploadComponent
+                          onImageUploaded={(url) => {
+                            imageForm.setValue("imageUrl", url);
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
