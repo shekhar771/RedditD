@@ -12,9 +12,8 @@ export async function GET (req: Request) {
     const sort =
       (searchParams.get('sort') as 'new' | 'top' | 'controversial' | 'hot') ||
       'hot'
-    const types = searchParams.get('types')?.split(',') as
-      | PostType[]
-      | undefined
+    const typesParam = searchParams.get('types')
+    const types = typesParam ? (typesParam.split(',') as PostType[]) : undefined
     const filterMode =
       (searchParams.get('filterMode') as 'subscribed' | 'all') || 'all'
 

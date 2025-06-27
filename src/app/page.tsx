@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { HomeIcon, PlusCircle } from "lucide-react";
+import { CompassIcon, HomeIcon, PlusCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -14,9 +14,7 @@ import { useAuth } from "./components/AuthProvider";
 import PostFeed from "./components/PostFeed";
 import PostFilters from "./components/post/Sorting";
 import TwoColumnLayout from "./components/PageLayout";
-
-export type SortOption = "new" | "top" | "controversial" | "hot";
-export type PostType = "TEXT" | "IMAGE" | "LINK";
+import { SortOption, PostType } from "@/app/types/post";
 
 export default function Home() {
   const router = useRouter();
@@ -26,9 +24,8 @@ export default function Home() {
   const [sort, setSort] = useState<SortOption>("hot");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleTypeClick = (type: PostType) => {
-    setSelectedTypes([type]); // Set the filter to only this type
-  };
+  // Remove the conflicting handleTypeClick function - we'll use the one in PostFilters
+
   const { mutate: createSubreddit, isLoading } = useMutation({
     mutationFn: async () => {
       const { data } = await axios.post("/api/subreddit", { name: input });
@@ -49,6 +46,15 @@ export default function Home() {
       router.push(`/r/${data}`);
     },
   });
+
+  // Function to handle single type selection (for sidebar quick filters)
+  const handleQuickFilter = (type: PostType | null) => {
+    if (type === null) {
+      setSelectedTypes([]);
+    } else {
+      setSelectedTypes([type]);
+    }
+  };
 
   // Sidebar content
   const sidebarContent = (
@@ -76,7 +82,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/*  Filters */}
+      {/* Quick Filters */}
       <div className="rounded-lg border bg-card p-4 space-y-3">
         <h3 className="font-medium">Quick Filters</h3>
         <div className="space-y-2">
@@ -84,7 +90,7 @@ export default function Home() {
             variant={selectedTypes.length === 0 ? "default" : "secondary"}
             size="sm"
             className="w-full justify-start"
-            onClick={() => setSelectedTypes([])}
+            onClick={() => handleQuickFilter(null)}
           >
             All posts
           </Button>
@@ -98,19 +104,36 @@ export default function Home() {
               }
               size="sm"
               className="w-full justify-start"
-              onClick={() => setSelectedTypes([type])}
+              onClick={() => handleQuickFilter(type)}
             >
               {type.toLowerCase()} only
             </Button>
           ))}
         </div>
       </div>
+      <Button
+        asChild
+        variant="ghost"
+        className="w-full bg-card rounded-lg border justify-start"
+      >
+        <Link href="/r/subreddits" className="flex items-center gap-2">
+          <CompassIcon className="w-4 h-4" />
+          Discover Communities
+        </Link>
+      </Button>
     </>
   );
 
   // Main content
   const mainContent = (
     <>
+      {" "}
+      <div className=" px-1 justify-center items-center bg-card text-xl rounded-xl py-2 mb-1">
+        <p className="font-semibold text-foreground flex items-center gap-1.5">
+          <HomeIcon className="w-6 h-6" />
+          {session?.user ? "Your Feed" : "Popular Posts"}
+        </p>
+      </div>
       {/* Post Filters */}
       <PostFilters
         selectedTypes={selectedTypes}
@@ -118,7 +141,6 @@ export default function Home() {
         sort={sort}
         onSortChange={setSort}
       />
-
       <PostFeed
         queryKey="some-query-key"
         sort={sort}

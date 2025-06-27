@@ -8,27 +8,21 @@ export async function GET (request: NextRequest) {
   const page = parseInt(searchParams.get('page') || '1')
   const pageSize = parseInt(searchParams.get('pageSize') || '5')
   const sort = searchParams.get('sort') || 'new'
-  const filter = searchParams.get('filter') as PostType | null
+
+  // FIX: Get types array instead of single filter
+  const types = searchParams.get('types')?.split(',') as PostType[] | undefined
 
   console.log('Received request with params:', {
     subredditName,
     page,
     pageSize,
     sort,
-    filter
+    types // Changed from filter to types
   })
 
   if (!subredditName) {
     return NextResponse.json(
       { error: 'Subreddit name is required' },
-      { status: 400 }
-    )
-  }
-
-  // Validate filter
-  if (filter && !Object.values(PostType).includes(filter)) {
-    return NextResponse.json(
-      { error: 'Invalid post type filter' },
       { status: 400 }
     )
   }
@@ -40,8 +34,9 @@ export async function GET (request: NextRequest) {
       }
     }
 
-    if (filter) {
-      where.type = filter
+    // FIX: Apply types filter correctly
+    if (types && types.length > 0) {
+      where.type = { in: types }
     }
 
     let orderBy: any

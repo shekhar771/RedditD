@@ -12,12 +12,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
-import { PlusCircle } from "lucide-react";
 import { useAuth } from "@/app/components/AuthProvider";
 import { SubscribeLeaveToggle } from "./test";
-
-export type SortOption = "new" | "top" | "controversial" | "hot";
-export type PostType = "TEXT" | "IMAGE" | "LINK";
+import { SortOption, PostType } from "@/app/types/post";
 
 interface SubredditPageContentProps {
   subreddit: {
@@ -73,58 +70,61 @@ export default function SubredditPageContent({
     },
   });
 
-  // Sidebar content
+  // Sidebar content - improved for mobile
   const sidebarContent = (
-    <>
+    <div className="space-y-3 md:space-y-4">
       {/* Community Info */}
-      <div className="overflow-hidden h-fit rounded-lg border bg-card">
-        <div className="bg-secondary px-4 py-3">
-          <p className="font-semibold text-foreground">
+      <div className="overflow-hidden rounded-lg bg-card  md:border shadow-sm">
+        <div className="bg-secondary px-3 py-2 md:px-4 md:py-3 text-center md:text-left">
+          <p className="font-semibold text-foreground text-sm md:text-base">
             About r/{subreddit.name}
           </p>
         </div>
-        <div className="p-4 text-sm leading-6 space-y-4">
-          <p className="text-foreground">
+        <div className="p-3 md:p-4 text-sm leading-6 space-y-3 md:space-y-4 text-center md:text-left">
+          <p className="text-foreground text-xs md:text-sm leading-relaxed">
             {subreddit.description || "No description provided"}
           </p>
 
-          <div className="flex items-center gap-x-2">
-            <div
-              className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center
-            "
-            >
+          <div className="flex items-center justify-center md:justify-start gap-x-2">
+            <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
               <span className="text-xs">r/</span>
             </div>
-            <p className="text-sm text-foreground">
+            <p className="text-xs md:text-sm text-foreground truncate">
               Created by u/{subreddit.Creator?.username || "unknown"}
             </p>
           </div>
 
           <div className="pt-2 border-t">
-            <div className="flex justify-between">
-              <div>
-                <p className="font-medium">{subscriberCount}</p>
+            <div className="flex justify-center md:justify-between">
+              <div className="text-center md:text-left">
+                <p className="font-medium text-sm md:text-base">
+                  {subscriberCount}
+                </p>
                 <p className="text-muted-foreground text-xs">Members</p>
               </div>
             </div>
           </div>
 
-          <SubscribeLeaveToggle
-            subredditId={subreddit.id}
-            subredditName={subreddit.name}
-            isSubscribed={isSubscribed}
-          />
+          <div className="flex justify-center md:block pt-1">
+            <SubscribeLeaveToggle
+              subredditId={subreddit.id}
+              subredditName={subreddit.name}
+              isSubscribed={isSubscribed}
+            />
+          </div>
         </div>
       </div>
 
-      {/*  Filters */}
-      <div className="rounded-lg border bg-card p-4 space-y-3">
-        <h3 className="font-medium">Quick Filters</h3>
-        <div className="space-y-2">
+      {/* Filters - More compact on mobile */}
+      <div className="rounded-lg bg-card p-3 md:p-4 space-y-2 md:space-y-3 border-0 md:border shadow-sm">
+        <h3 className="font-medium text-center md:text-left text-sm md:text-base">
+          Quick Filters
+        </h3>
+        <div className="space-y-1.5 md:space-y-2">
           <Button
             variant={selectedTypes.length === 0 ? "default" : "secondary"}
             size="sm"
-            className="w-full justify-start"
+            className="w-full justify-center md:justify-start h-8 md:h-9 text-xs md:text-sm"
             onClick={() => setSelectedTypes([])}
           >
             All posts
@@ -138,7 +138,7 @@ export default function SubredditPageContent({
                   : "secondary"
               }
               size="sm"
-              className="w-full justify-start"
+              className="w-full justify-center md:justify-start h-8 md:h-9 text-xs md:text-sm"
               onClick={() => setSelectedTypes([type])}
             >
               {type.toLowerCase()} only
@@ -146,9 +146,8 @@ export default function SubredditPageContent({
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
-
   // Main content
   const mainContent = (
     <>

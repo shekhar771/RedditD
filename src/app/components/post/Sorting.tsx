@@ -9,8 +9,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 
-export type SortOption = "New" | "Top" | "Controversial" | "Hot";
-export type PostType = "TEXT" | "IMAGE" | "LINK";
+import { SortOption, PostType } from "@/app/types/post";
 
 interface PostFiltersProps {
   selectedTypes: PostType[];

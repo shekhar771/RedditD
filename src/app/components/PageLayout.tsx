@@ -25,20 +25,39 @@ export default function TwoColumnLayout({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Close sidebar when clicking outside
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsSidebarOpen(false);
+    };
+
+    if (isSidebarOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden"; // Prevent background scroll
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isSidebarOpen]);
+
   return (
     <div className="relative">
-      {/* Floating sidebar toggle button (bottom right) */}
+      {/* Floating sidebar toggle button */}
       {isMobile && (
         <Button
           variant="secondary"
           size="icon"
-          className="fixed bottom-6 right-6 z-50 rounded-full p-2 h-12 w-12 shadow-lg md:hidden"
+          className="fixed bottom-4 right-4 z-50 rounded-full h-14 w-14 shadow-lg border-2 md:hidden hover:scale-105 transition-transform"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
           {isSidebarOpen ? (
-            <X className="h-5 w-5" />
+            <X className="h-6 w-6" />
           ) : (
-            <Menu className="h-5 w-5" />
+            <Menu className="h-6 w-6" />
           )}
         </Button>
       )}
@@ -46,29 +65,54 @@ export default function TwoColumnLayout({
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Main content */}
-          <div className="flex-1 min-w-0">{mainContent}</div>{" "}
-          {/* Added min-w-0 */}
+          <div className="flex-1 min-w-0">{mainContent}</div>
+
           {/* Sidebar */}
           <div
-            className={`md:w-80 space-y-4 ${
+            className={`md:w-80 ${
               isMobile
-                ? `fixed inset-y-0 left-0 z-40 w-72 bg-background p-4 border-r transform ${
-                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-                  } transition-transform duration-300 ease-in-out overflow-y-auto`
+                ? `fixed inset-0 z-40 bg-background transform ${
+                    isSidebarOpen ? "translate-y-0" : "translate-y-full"
+                  } transition-transform duration-300 ease-out`
                 : ""
             }`}
           >
-            {sidebarContent}
+            {isMobile && isSidebarOpen ? (
+              // Mobile sidebar with header
+              <div className="h-full flex flex-col">
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
+                  <h2 className="text-lg font-semibold">Community Info</h2>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="h-8 w-8"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                {/* Scrollable content */}
+                <div className="flex-1 overflow-y-auto p-4 pb-20">
+                  <div className="space-y-4">{sidebarContent}</div>
+                </div>
+              </div>
+            ) : (
+              // Desktop sidebar
+              <div className="space-y-4">{sidebarContent}</div>
+            )}
           </div>
-          {/* Overlay when sidebar is open */}
-          {isMobile && isSidebarOpen && (
-            <div
-              className="fixed inset-0 z-30 bg-black/50 md:hidden"
-              onClick={() => setIsSidebarOpen(false)}
-            />
-          )}
         </div>
       </div>
+
+      {/* Backdrop overlay */}
+      {isMobile && isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }
