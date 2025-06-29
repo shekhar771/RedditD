@@ -21,7 +21,7 @@ export default function Home() {
   const { user, session } = useAuth();
   const [input, setInput] = useState<string>("");
   const [selectedTypes, setSelectedTypes] = useState<PostType[]>([]);
-  const [sort, setSort] = useState<SortOption>("hot");
+  const [sort, setSort] = useState<SortOption>("new");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Remove the conflicting handleTypeClick function - we'll use the one in PostFilters
@@ -114,7 +114,7 @@ export default function Home() {
       <Button
         asChild
         variant="ghost"
-        className="w-full bg-card rounded-lg border justify-start"
+        className="w-full bg-card rounded-lg p-2 border justify-start"
       >
         <Link href="/r/subreddits" className="flex items-center gap-2">
           <CompassIcon className="w-4 h-4" />

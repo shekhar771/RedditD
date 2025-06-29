@@ -16,6 +16,7 @@ import {
   Link as LinkIcon,
   FileText,
 } from "lucide-react";
+import { ImageModal } from "./ImageModal";
 
 export type PostWithRelations = Post & {
   author: User;
@@ -166,28 +167,44 @@ export const PostContentRenderers = {
   renderImageContent: (
     post: PostWithRelations,
     variant: "list" | "detail" = "list"
-  ) => (
-    <div className="mt-2">
-      {post.imageUrl && (
-        <div
-          className={`relative w-full rounded-md overflow-hidden bg-secondary ${
-            variant === "detail" ? "max-h-[70vh]" : "max-h-[400px]"
-          }`}
-        >
-          <img
-            src={post.imageUrl}
-            alt={post.imageAlt || "Post image"}
-            className={`object-contain w-full h-full ${
-              variant === "detail"
-                ? "max-h-[70vh] cursor-zoom-in"
-                : "max-h-[400px] hover:scale-105 transition-transform duration-300"
-            }`}
-            loading="lazy"
-          />
-        </div>
-      )}
-    </div>
-  ),
+  ) => {
+    const [isImageOpen, setIsImageOpen] = React.useState(false);
+
+    return (
+      <div className="mt-2">
+        {post.imageUrl && (
+          <>
+            <div
+              className={`relative w-full rounded-md overflow-hidden bg-secondary ${
+                variant === "detail" ? "max-h-[70vh]" : "max-h-[400px]"
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsImageOpen(true);
+              }}
+            >
+              <img
+                src={post.imageUrl}
+                alt={post.imageAlt || "Post image"}
+                className={`object-contain w-full h-full ${
+                  variant === "detail"
+                    ? "max-h-[70vh] cursor-zoom-in"
+                    : "max-h-[400px] hover:scale-105 transition-transform duration-300"
+                }`}
+                loading="lazy"
+              />
+            </div>
+            <ImageModal
+              src={post.imageUrl}
+              alt={post.imageAlt || "Post image"}
+              open={isImageOpen}
+              onClose={() => setIsImageOpen(false)}
+            />
+          </>
+        )}
+      </div>
+    );
+  },
 
   renderLinkContent: (
     post: PostWithRelations,
@@ -359,4 +376,4 @@ const PostCard: React.FC<PostCardProps> = ({
   );
 };
 
-export default PostCard;
+export default React.memo(PostCard);

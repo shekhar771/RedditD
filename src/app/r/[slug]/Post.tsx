@@ -43,7 +43,7 @@ export default function SubredditPageContent({
   const { user, session } = useAuth();
   const [input, setInput] = useState<string>("");
   const [selectedTypes, setSelectedTypes] = useState<PostType[]>([]);
-  const [sort, setSort] = useState<SortOption>("hot");
+  const [sort, setSort] = useState<SortOption>("new");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { mutate: createPost, isLoading } = useMutation({

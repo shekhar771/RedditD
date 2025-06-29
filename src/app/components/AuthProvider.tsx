@@ -81,6 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       const data = await response.json();
+      router.push("/");
 
       if (!response.ok) {
         throw new Error(data.error || "Signup failed");

@@ -98,8 +98,17 @@ export async function GET (req: Request) {
             name: true
           }
         },
-        comment: true,
-        Vote: true
+        comment: {
+          select: {
+            id: true // Or _count if you only need comment count
+          }
+        },
+        Vote: {
+          select: {
+            type: true,
+            userId: true
+          }
+        }
       },
       orderBy,
       take: pageSize,

@@ -86,9 +86,19 @@ export async function GET (request: NextRequest) {
             name: true
           }
         },
-        comment: true,
-        Vote: true
+        comment: {
+          select: {
+            id: true // Or _count if you only need comment count
+          }
+        },
+        Vote: {
+          select: {
+            type: true,
+            userId: true
+          }
+        }
       },
+
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy

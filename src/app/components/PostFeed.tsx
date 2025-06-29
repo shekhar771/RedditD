@@ -95,7 +95,9 @@ export default function PostFeed({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          fetchNextPage();
+          setTimeout(() => {
+            fetchNextPage();
+          }, 100); // add slight delay
         }
       },
       { threshold: 0.1 }

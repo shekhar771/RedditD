@@ -1,4 +1,3 @@
-// app/api/auth/github/callback/route.ts
 import { github } from '@/lib/auth'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -30,7 +29,6 @@ export async function GET (request: Request): Promise<Response> {
       )
     }
 
-    // Get the tokens from GitHub
     const tokens = await github.validateAuthorizationCode(code)
     const accessToken = tokens.data.access_token
 
@@ -40,7 +38,6 @@ export async function GET (request: Request): Promise<Response> {
       )
     }
 
-    // Fetch GitHub user data
     const githubUserResponse = await fetch('https://api.github.com/user', {
       headers: {
         Accept: 'application/vnd.github.v3+json',
@@ -57,7 +54,6 @@ export async function GET (request: Request): Promise<Response> {
 
     const githubUser = await githubUserResponse.json()
 
-    // Fetch user's emails
     const emailsResponse = await fetch('https://api.github.com/user/emails', {
       headers: {
         Accept: 'application/vnd.github.v3+json',
@@ -75,19 +71,40 @@ export async function GET (request: Request): Promise<Response> {
       )
     }
 
-    // Find or create user
-    let user = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: primaryEmail.email }, { username: githubUser.login }]
-      }
+    let user = await prisma.user.findUnique({
+      where: { email: primaryEmail.email }
     })
 
     if (!user) {
-      // Create new user
+      let username = githubUser.login
+      let usernameExists = true
+      let attempt = 0
+      const maxAttempts = 5
+
+      while (usernameExists && attempt < maxAttempts) {
+        if (attempt > 0) {
+          const randomDigits = Math.floor(1000 + Math.random() * 9000)
+          username = `${githubUser.login}${randomDigits}`
+        }
+
+        const existingUser = await prisma.user.findUnique({
+          where: { username }
+        })
+
+        if (!existingUser) {
+          usernameExists = false
+        }
+        attempt++
+      }
+
+      if (usernameExists) {
+        throw new Error('Could not generate unique username')
+      }
+
       user = await prisma.user.create({
         data: {
           email: primaryEmail.email,
-          username: githubUser.login,
+          username: username,
           name: githubUser.name || githubUser.login,
           image: githubUser.avatar_url,
           emailVerified: primaryEmail.verified ? new Date() : null
@@ -95,7 +112,6 @@ export async function GET (request: Request): Promise<Response> {
       })
     }
 
-    // Update or create account
     await prisma.account.upsert({
       where: {
         provider_providerAccountId: {
@@ -118,16 +134,10 @@ export async function GET (request: Request): Promise<Response> {
       }
     })
 
-    // Create session
     const sessionToken = generateRandomSessionToken()
     const session = await createSession(sessionToken, user.id)
-
-    // Create response with redirect
     const response = NextResponse.redirect(new URL('/', request.url))
-
-    // Set session cookie
     await setSessionCookie(sessionToken, session.expires, response)
-
     return response
   } catch (error) {
     console.error('GitHub OAuth error:', error)

@@ -6,6 +6,8 @@ import {
   generateRandomSessionToken
 } from '@/app/api/auth/[...auth]/session'
 import { setSessionCookie } from '@/app/api/auth/[...auth]/cookie'
+import { baseUrl } from '@/lib/auth'
+
 export async function GET (req: NextRequest) {
   try {
     const url = new URL(req.url)
@@ -18,7 +20,7 @@ export async function GET (req: NextRequest) {
       )
     }
 
-    const cookieStore = await cookies() 
+    const cookieStore = await cookies()
     const storedState = cookieStore.get('google_oauth_state')?.value
     const codeVerifier = cookieStore.get('google_code_verifier')?.value
 
@@ -38,7 +40,7 @@ export async function GET (req: NextRequest) {
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
         code,
         grant_type: 'authorization_code',
-        redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/callback`,
+        redirect_uri: `/api/auth/google/callback`,
         code_verifier: codeVerifier!
       })
     })
@@ -73,7 +75,9 @@ export async function GET (req: NextRequest) {
     }
 
     const userInfo = await userResponse.json()
-    console.log('User Info:', userInfo)
+    const baseUsername = userInfo.email.split('@')[0]
+    let username = baseUsername
+
     const user = await prisma.user.upsert({
       where: { email: userInfo.email },
       update: {
@@ -83,20 +87,48 @@ export async function GET (req: NextRequest) {
       },
       create: {
         email: userInfo.email,
+        username: username,
         name: userInfo.name,
         image: userInfo.picture,
         emailVerified: new Date()
       }
     })
 
+    if (!user.username) {
+      let usernameExists = true
+      let attempt = 0
+      const maxAttempts = 5
+
+      while (usernameExists && attempt < maxAttempts) {
+        if (attempt > 0) {
+          const randomDigits = Math.floor(1000 + Math.random() * 9000)
+          username = `${baseUsername}${randomDigits}`
+        }
+
+        const existingUser = await prisma.user.findUnique({
+          where: { username }
+        })
+
+        if (!existingUser) {
+          usernameExists = false
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { username }
+          })
+        }
+        attempt++
+      }
+
+      if (usernameExists) {
+        throw new Error('Could not generate unique username')
+      }
+    }
+
     const sessionToken = generateRandomSessionToken()
     const session = await createSession(sessionToken, user.id)
-
     const response = NextResponse.redirect(new URL('/', req.url))
     await setSessionCookie(sessionToken, session.expires, response)
     return response
-
-    return NextResponse.redirect(new URL('/', req.url))
   } catch (error) {
     console.error('OAuth error:', error)
     return NextResponse.redirect(new URL('/login?error=oauth_failed', req.url))
