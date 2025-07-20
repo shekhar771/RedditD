@@ -12,11 +12,13 @@ import VoteComponent from "@/app/components/Vote";
 import {
   MessageCircle,
   Share2,
+  Trash,
   Image as ImageIcon,
   Link as LinkIcon,
   FileText,
 } from "lucide-react";
 import { ImageModal } from "./ImageModal";
+import axios from "axios";
 
 export type PostWithRelations = Post & {
   author: User;
@@ -35,6 +37,7 @@ interface PostCardProps {
   showActions?: boolean;
   onPostClick?: (postId: string) => void;
   className?: string;
+  onTypeClick?: (type: PostType) => void; // Added this missing prop
 }
 
 export const getPostTypeIcon = (type: string) => {
@@ -149,6 +152,7 @@ export const PostTypeIndicator: React.FC<{
     </div>
   );
 };
+
 export const PostContentRenderers = {
   renderTextContent: (
     post: PostWithRelations,
@@ -253,8 +257,9 @@ export const PostActions: React.FC<{
   post: PostWithRelations;
   onShare: () => void;
   onCommentClick?: () => void;
+  onDelete?: () => void;
   session: any;
-}> = ({ post, onShare, onCommentClick, session }) => (
+}> = ({ post, onShare, onCommentClick, onDelete, session }) => (
   <div className="mt-3 flex items-center gap-2">
     <div onClick={(e) => e.stopPropagation()}>
       <VoteComponent post={post} sessionUserId={session?.user?.id} />
@@ -276,9 +281,23 @@ export const PostActions: React.FC<{
     >
       <Share2 className="h-4 w-4" />
     </Button>
+    {post.authorId === session?.user?.id && onDelete && (
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-muted-foreground hover:text-foreground gap-1 px-2"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+      >
+        <Trash className="h-4 w-4" />
+      </Button>
+    )}
   </div>
 );
 
+// Fixed PostCard component - handleDelete uses post.id from closure
 const PostCard: React.FC<PostCardProps> = ({
   post,
   session,
@@ -290,6 +309,38 @@ const PostCard: React.FC<PostCardProps> = ({
 }) => {
   const router = useRouter();
   const { toast } = useToast();
+
+  // Fixed: handleDelete now uses post.id from the component scope
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/posts/${post.id}/delete`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete post");
+      }
+
+      const data = await response.json();
+
+      toast({
+        title: "Success",
+        description: data.message,
+        variant: "default",
+      });
+
+      window.location.href = `${window.location.origin}/r/${post.subreddit.name}`;
+    } catch (err) {
+      toast({
+        title: "Error",
+        description:
+          err instanceof Error ? err.message : "Failed to delete post",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -347,6 +398,7 @@ const PostCard: React.FC<PostCardProps> = ({
         return PostContentRenderers.renderTextContent(post, variant);
     }
   };
+
   return (
     <div
       className={`bg-card text-card-foreground rounded-md border hover:border-muted-foreground/30 transition-colors duration-200 flex mb-3 cursor-pointer ${className}`}
@@ -368,6 +420,7 @@ const PostCard: React.FC<PostCardProps> = ({
             post={post}
             onShare={handleShare}
             onCommentClick={handleCommentClick}
+            onDelete={handleDelete} // Changed: pass the function reference
             session={session}
           />
         )}
@@ -376,4 +429,4 @@ const PostCard: React.FC<PostCardProps> = ({
   );
 };
 
-export default React.memo(PostCard);
+export default PostCard;

@@ -6,7 +6,7 @@ import {
   generateRandomSessionToken
 } from '@/app/api/auth/[...auth]/session'
 import { setSessionCookie } from '@/app/api/auth/[...auth]/cookie'
-import { baseUrl } from '@/lib/auth'
+import { baseUrl } from '@/lib/auth' // Import baseUrl
 
 export async function GET (req: NextRequest) {
   try {
@@ -15,8 +15,9 @@ export async function GET (req: NextRequest) {
     const code = url.searchParams.get('code')
 
     if (!state || !code) {
+      // Redirect if state or code is missing
       return NextResponse.redirect(
-        new URL('/login?error=missing_params', req.url)
+        new URL('/login?error=missing_params', baseUrl)
       )
     }
 
@@ -25,13 +26,15 @@ export async function GET (req: NextRequest) {
     const codeVerifier = cookieStore.get('google_code_verifier')?.value
 
     if (!storedState || !codeVerifier || state !== storedState) {
+      // Clear cookies and redirect if state is invalid
       cookieStore.delete('google_oauth_state')
       cookieStore.delete('google_code_verifier')
       return NextResponse.redirect(
-        new URL('/login?error=invalid_state', req.url)
+        new URL('/login?error=invalid_state', baseUrl)
       )
     }
 
+    // Exchange authorization code for tokens
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -40,15 +43,22 @@ export async function GET (req: NextRequest) {
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
         code,
         grant_type: 'authorization_code',
-        redirect_uri: `/api/auth/google/callback`,
+        // --- THIS IS THE FIX ---
+        // The redirect_uri must be an absolute URL and exactly match
+        // the one registered in your Google Cloud Console.
+        redirect_uri: `${baseUrl}/api/auth/google/callback`,
         code_verifier: codeVerifier!
       })
     })
 
+    // Log the raw response for debugging if the fetch fails
     if (!tokenResponse.ok) {
-      console.error('Token fetch error:', await tokenResponse.text())
+      const errorText = await tokenResponse.text()
+      console.error('Token fetch error:', errorText)
+      // IMPORTANT: The error from Google is in this 'errorText' variable.
+      // Check your server logs on Vercel to see the detailed error message.
       return NextResponse.redirect(
-        new URL('/login?error=token_fetch_failed', req.url)
+        new URL('/login?error=token_fetch_failed', baseUrl)
       )
     }
 
@@ -56,10 +66,11 @@ export async function GET (req: NextRequest) {
 
     if (!tokens.access_token) {
       return NextResponse.redirect(
-        new URL('/login?error=invalid_access_token', req.url)
+        new URL('/login?error=invalid_access_token', baseUrl)
       )
     }
 
+    // Fetch user information from Google
     const userResponse = await fetch(
       'https://www.googleapis.com/oauth2/v3/userinfo',
       {
@@ -70,7 +81,7 @@ export async function GET (req: NextRequest) {
     if (!userResponse.ok) {
       console.error('User fetch error:', await userResponse.text())
       return NextResponse.redirect(
-        new URL('/login?error=user_fetch_failed', req.url)
+        new URL('/login?error=user_fetch_failed', baseUrl)
       )
     }
 
@@ -78,6 +89,7 @@ export async function GET (req: NextRequest) {
     const baseUsername = userInfo.email.split('@')[0]
     let username = baseUsername
 
+    // Find existing user or create a new one
     const user = await prisma.user.upsert({
       where: { email: userInfo.email },
       update: {
@@ -87,13 +99,14 @@ export async function GET (req: NextRequest) {
       },
       create: {
         email: userInfo.email,
-        username: username,
+        username: username, // Initially set username
         name: userInfo.name,
         image: userInfo.picture,
         emailVerified: new Date()
       }
     })
 
+    // Logic to ensure the username is unique
     if (!user.username) {
       let usernameExists = true
       let attempt = 0
@@ -120,17 +133,24 @@ export async function GET (req: NextRequest) {
       }
 
       if (usernameExists) {
-        throw new Error('Could not generate unique username')
+        // Handle the rare case where a unique username couldn't be generated
+        throw new Error('Could not generate a unique username.')
       }
     }
 
+    // Create a session for the user
     const sessionToken = generateRandomSessionToken()
     const session = await createSession(sessionToken, user.id)
-    const response = NextResponse.redirect(new URL('/', req.url))
+    const response = NextResponse.redirect(new URL('/', baseUrl)) // Redirect to home
     await setSessionCookie(sessionToken, session.expires, response)
+
+    // Clean up OAuth cookies after successful login
+    cookieStore.delete('google_oauth_state')
+    cookieStore.delete('google_code_verifier')
+
     return response
   } catch (error) {
-    console.error('OAuth error:', error)
-    return NextResponse.redirect(new URL('/login?error=oauth_failed', req.url))
+    console.error('OAuth callback error:', error)
+    return NextResponse.redirect(new URL('/login?error=oauth_failed', baseUrl))
   }
 }

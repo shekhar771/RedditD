@@ -10,12 +10,8 @@ export async function GET (
     const resolvedParams = await params
 
     // Add debugging
-    console.log('API Route - Full params object:', resolvedParams)
-    console.log('API Route - post from params:', resolvedParams.post)
-    console.log('API Route - Request URL:', request.url)
 
     if (!resolvedParams.post) {
-      console.log('API Route - No post ID provided')
       return NextResponse.json(
         { error: 'Post ID is required', receivedParams: resolvedParams },
         { status: 400 }

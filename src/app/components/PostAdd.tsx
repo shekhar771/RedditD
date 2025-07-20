@@ -107,6 +107,11 @@ const PostCreationTabs = ({
         title: "Success",
         description: "Post created successfully!",
       });
+      try {
+        window.location.href = `/r/${response.data.subredditName}/post/${response.data.postId}`;
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       let errorMessage = "Failed to create post";
       if (axios.isAxiosError(error)) {
@@ -145,7 +150,11 @@ const PostCreationTabs = ({
         description: "Image post created successfully!",
       });
       console.log(response.data);
-      window.location.href = `/r/${response.data.subredditName}/post/${response.data.postId}`;
+      try {
+        window.location.href = `/r/${response.data.subredditName}/post/${response.data.postId}`;
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       console.error("Error creating image post:", error);
       toast({

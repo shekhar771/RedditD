@@ -1,7 +1,9 @@
 import { GitHub } from 'arctic'
 import { Google } from 'arctic'
 
-export const baseUrl = 'https://redditd.vercel.app'
+export const baseUrl = 'https://reddit2-beta.vercel.app'
+// export const baseUrl = 'http://localhost:3000'
+
 // ? `https://${process.env.VERCEL_URL}`
 // : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 

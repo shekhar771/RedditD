@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calendar, Users, Info, Shield } from "lucide-react";
 import { formatDistance } from "date-fns";
+import Link from "next/link";
 
 const SubredditSidebar = ({ subreddit, subscriberCount }) => {
   const formattedDate = subreddit.createdAt
@@ -49,7 +50,7 @@ const SubredditSidebar = ({ subreddit, subscriberCount }) => {
         </CardContent>
         <CardFooter>
           <Button className="w-full" variant="outline">
-            Create Post
+            <Link> Create Post</Link>
           </Button>
         </CardFooter>
       </Card>

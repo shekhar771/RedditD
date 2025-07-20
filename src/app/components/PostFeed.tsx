@@ -1,10 +1,9 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback, useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import PostCard from "@/app/components/Post";
 import { useAuth } from "./AuthProvider";
 import { Loader2 } from "lucide-react";
-
 import { SortOption, PostType } from "@/app/types/post";
 
 interface PostFeedProps {
@@ -15,7 +14,7 @@ interface PostFeedProps {
   subreddit?: string;
 }
 
-const PostSkeleton = () => (
+const PostSkeleton = React.memo(() => (
   <div className="bg-white dark:bg-gray-800 rounded-md shadow p-4 mb-4 animate-pulse">
     <div className="flex items-start space-x-3">
       <div className="flex flex-col items-center">
@@ -40,7 +39,7 @@ const PostSkeleton = () => (
       </div>
     </div>
   </div>
-);
+));
 
 export default function PostFeed({
   queryKey,
@@ -52,24 +51,16 @@ export default function PostFeed({
   const { session } = useAuth();
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    status,
-    error,
-  } = useInfiniteQuery({
-    queryKey: [queryKey, sort, selectedTypes, filterMode, subreddit],
-    queryFn: async ({ pageParam = 1 }) => {
+  // Memoize the query function to prevent recreation
+  const queryFn = useCallback(
+    async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         page: pageParam.toString(),
-        pageSize: "5",
+        pageSize: "10", // Increased from 5 to reduce requests
         sort,
         filterMode,
       });
 
-      // ✅ Fix: Join types with commas instead of creating multiple params
       if (selectedTypes.length > 0) {
         params.append("types", selectedTypes.join(","));
       }
@@ -82,46 +73,74 @@ export default function PostFeed({
       const { data } = await axios.get(`${endpoint}?${params.toString()}`);
       return data;
     },
+    [sort, selectedTypes, filterMode, subreddit]
+  );
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+    error,
+  } = useInfiniteQuery({
+    queryKey: [queryKey, sort, selectedTypes, filterMode, subreddit],
+    queryFn,
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages) => {
       return lastPage.hasMore ? pages.length + 1 : undefined;
     },
+    // Add stale time to prevent unnecessary refetches
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    // Reduce background refetch frequency
+    refetchOnWindowFocus: false,
   });
 
-  // Infinite scroll effect
+  // Memoize the intersection observer callback
+  const intersectionCallback = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage]
+  );
+
+  // Optimized infinite scroll effect
   useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
+    const observer = new IntersectionObserver(intersectionCallback, {
+      threshold: 0.1,
+      rootMargin: "100px", // Start loading before element is visible
+    });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setTimeout(() => {
-            fetchNextPage();
-          }, 100); // add slight delay
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
     };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [intersectionCallback]);
+
+  // Memoize the skeleton components
+  const skeletonComponents = useMemo(
+    () => Array.from({ length: 3 }, (_, i) => <PostSkeleton key={i} />),
+    []
+  );
+
+  const loadingSkeletons = useMemo(
+    () =>
+      Array.from({ length: 2 }, (_, i) => (
+        <PostSkeleton key={`loading-${i}`} />
+      )),
+    []
+  );
 
   if (status === "loading") {
-    return (
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <PostSkeleton key={i} />
-        ))}
-      </div>
-    );
+    return <div className="space-y-4">{skeletonComponents}</div>;
   }
 
   if (status === "error") {
@@ -137,7 +156,7 @@ export default function PostFeed({
 
   if (!data?.pages[0]?.posts?.length) {
     return (
-      <div className="text-center py-8 ">
+      <div className="text-center py-8">
         <p className="text-muted-foreground">No posts found</p>
         <p className="text-sm text-muted-foreground mt-1">
           Try adjusting your filters or check back later
@@ -151,7 +170,7 @@ export default function PostFeed({
       {data.pages.map((page, pageIndex) => (
         <React.Fragment key={pageIndex}>
           {page.posts.map((post: any) => (
-            <PostCard session={session} key={post.id} post={post} />
+            <PostCard key={post.id} post={post} session={session} />
           ))}
         </React.Fragment>
       ))}
@@ -160,8 +179,7 @@ export default function PostFeed({
 
       {isFetchingNextPage && (
         <>
-          <PostSkeleton />
-          <PostSkeleton />
+          {loadingSkeletons}
           <div className="flex justify-center py-4">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>

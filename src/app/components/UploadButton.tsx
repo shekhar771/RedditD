@@ -19,12 +19,11 @@ export default function UploadComponent({ onImageUploaded = null }) {
         onUploadBegin={() => setIsUploading(true)}
         onClientUploadComplete={(res) => {
           setIsUploading(false);
-          if (res?.[0]?.ufsUrl) {
-            setUploadedUrl(res[0].ufsUrl);
+          if (res?.[0]?.url) {
+            setUploadedUrl(res[0].url);
 
-            // Only call the callback if it exists
             if (typeof onImageUploaded === "function") {
-              onImageUploaded(res[0].ufsUrl);
+              onImageUploaded(res[0].url);
             }
 
             alert("Upload completed successfully!");

@@ -10,23 +10,37 @@ export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
     // Set permissions and file types for this FileRoute
     .middleware(async () => {
-      // This code runs on your server before upload
-      const user = getServerSession(); // Replace with actual auth
+      try {
+        // This code runs on your server before upload
+        const user = await getServerSession(); // Make sure this is awaited
+        
+        console.log("Upload middleware - User:", user?.user?.id || "No user");
+        
+        // If you throw, the user will not be able to upload
+        // Uncomment this if you want to require authentication
+        // if (!user) throw new Error("Unauthorized");
 
-      // If you throw, the user will not be able to upload
-      // if (!user) throw new Error("Unauthorized");
-
-      // Whatever is returned here is accessible in onUploadComplete as `metadata`
-      return { userId: (await user).user?.id };
-      // return { userId: "testing" };
+        // Whatever is returned here is accessible in onUploadComplete as `metadata`
+        return { userId: user?.user?.id || "anonymous" };
+      } catch (error) {
+        console.error("Middleware error:", error);
+        // Return default metadata if auth fails
+        return { userId: "anonymous" };
+      }
     })
     .onUploadComplete(async ({ metadata, file }) => {
       // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete for userId:", metadata.userId);
-      console.log("file url", file.ufsUrl);
-
-      // Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-      return { uploadedBy: metadata.userId, url: file.ufsUrl };
+      console.log("File URL:", file.url);
+      console.log("File key:", file.key);
+      
+      // Make sure to return the correct URL structure
+      return { 
+        uploadedBy: metadata.userId, 
+        url: file.url, // This is the main URL
+        key: file.key,
+        name: file.name
+      };
     }),
 } satisfies FileRouter;
 
