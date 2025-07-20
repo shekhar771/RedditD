@@ -49,8 +49,8 @@ const SubredditSidebar = ({ subreddit, subscriberCount }) => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full" variant="outline">
-            <Link> Create Post</Link>
+          <Button className="w-full" variant="outline" asChild>
+            <Link href={`/r/${subreddit.name}/submit`}>Create Post</Link>
           </Button>
         </CardFooter>
       </Card>
