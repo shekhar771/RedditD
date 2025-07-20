@@ -1,31 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Here’s an improved and professional version of your GitHub README for your Reddit Clone:
 
-## Getting Started
+---
 
-First, run the development server:
+# 🚀 Reddit Clone – Full Stack Social Platform
+
+[🌐 Live Demo](https://reddit2-beta.vercel.app/)* https://reddit2-beta.vercel.app/
+
+
+A fully-featured Reddit-style application built using modern web technologies. This project replicates core social functionalities like post sharing, voting, commenting, and community management with a custom authentication system powered by Lucia Auth.
+
+---
+
+## 🔥 Features
+
+### 🛡️ Authentication
+
+* Custom auth system built with **Lucia Auth**
+* Supports **Google**, **GitHub**, and **Email/Password** logins
+* **Secure session management** using HTTP-only cookies
+* Role-based route protection and access control
+
+### 📝 Posts & Interactions
+
+* Create and browse posts (Text, Image, Link)
+* **Vote system**: upvotes, downvotes, and real-time updates
+* **Nested comments** with reply threading
+* **Post sorting**: Hot, New, Top, Controversial
+* **Post filtering**: View posts by type
+
+### 🌐 Subreddits
+
+* Create and manage subreddit communities
+* Subscribe/unsubscribe to communities
+* Community-specific post feeds
+
+### ⚡ Performance
+
+* **Optimized Prisma queries**
+* **Infinite scrolling** powered by React Query
+* **Optimistic UI** updates for seamless interactions
+* **Server-side rendering (SSR)** for improved performance and SEO
+
+---
+
+## 🛠 Tech Stack
+
+### 🧩 Frontend
+
+* [Next.js 14](https://nextjs.org/) (App Router)
+* [TypeScript](https://www.typescriptlang.org/)
+* [shadcn/ui](https://ui.shadcn.com/) (Tailwind + Radix UI)
+* [React Query](https://tanstack.com/query/latest) for data fetching
+* [Zod](https://zod.dev/) for schema validation
+
+### ⚙️ Backend
+
+* Next.js API Routes
+* [PostgreSQL](https://www.postgresql.org/)
+* [Prisma](https://www.prisma.io/) ORM
+* [Lucia Auth](https://lucia-auth.com/) for authentication
+* OAuth via Google & GitHub
+
+### ☁️ Infrastructure
+
+* [Vercel](https://vercel.com/) for hosting
+* [Supabase](https://supabase.com/) for PostgreSQL DB
+
+---
+
+## 🚀 Getting Started
+
+### ✅ Prerequisites
+
+* **Node.js** v18 or higher
+* Access to a **PostgreSQL** database
+* Google/GitHub OAuth credentials (for social login)
+
+### 🧰 Installation
 
 ```bash
-npm run dev
+# 1. Clone the repo
+git clone https://github.com/your-username/reddit-clone.git
+cd reddit-clone
 
+# 2. Install dependencies
+npm install
+
+# 3. Set up environment variables
+cp .env.example .env
+# Add DB credentials and OAuth keys in .env
+
+# 4. Run local dev server
+npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Screenshots 🖼️
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Post Creation
+![Create Post](./public/cr4reate%20post.png)
 
-## Learn More
+### Comment Section
+![Nested Comments](./public/nested%20comments.PNG)
 
-To learn more about Next.js, take a look at the following resources:
+### Homepage
+![Subreddit View](./subreddit.PNG)
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📌 Roadmap / To-Do *(Optional)*
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* Moderation tools (ban users, remove posts)
+* Real-time updates ( WebSockets )
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
