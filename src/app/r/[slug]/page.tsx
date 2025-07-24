@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "@/lib/server-auth";
 import SubredditPageContent from "./Post";
+import type { Subreddit, User, Subscription } from "@prisma/client";
 
 interface PageProps {
   params: {
@@ -9,42 +10,57 @@ interface PageProps {
   };
 }
 
+interface SubredditWithCreator extends Subreddit {
+  Creator: User;
+}
+
 export default async function Page({ params }: PageProps) {
   const { slug } = params;
-  const { user } = await getServerSession();
 
-  const subreddit = await prisma.subreddit.findFirst({
-    where: { name: slug },
-    include: {
-      Creator: true,
-    },
-  });
+  try {
+    const session = await getServerSession();
+    const { user } = session || {};
 
-  if (!subreddit) return notFound();
-
-  const subscriberCount = await prisma.subscription.count({
-    where: { subredditId: subreddit.id },
-  });
-
-  let isSubscribed = false;
-  if (user) {
-    const subscription = await prisma.subscription.findUnique({
-      where: {
-        UserId_subredditId: {
-          UserId: user.id,
-          subredditId: subreddit.id,
+    // Fetch subreddit and subscriber count in parallel
+    const [subreddit, subscriberCount] = await Promise.all([
+      prisma.subreddit.findFirst({
+        where: { name: slug },
+        include: {
+          Creator: true,
         },
-      },
-    });
-    isSubscribed = !!subscription;
-  }
+      }) as Promise<SubredditWithCreator | null>,
 
-  return (
-    <SubredditPageContent
-      subreddit={subreddit}
-      subscriberCount={subscriberCount}
-      isSubscribed={isSubscribed}
-      slug={slug}
-    />
-  );
+      prisma.subscription.count({
+        where: { subreddit: { name: slug } },
+      }),
+    ]);
+
+    if (!subreddit) return notFound();
+
+    // Check subscription status if user is logged in
+    let isSubscribed = false;
+    if (user) {
+      const subscription = (await prisma.subscription.findUnique({
+        where: {
+          UserId_subredditId: {
+            UserId: user.id,
+            subredditId: subreddit.id,
+          },
+        },
+      })) as Subscription | null;
+      isSubscribed = !!subscription;
+    }
+
+    return (
+      <SubredditPageContent
+        subreddit={subreddit}
+        subscriberCount={subscriberCount}
+        isSubscribed={isSubscribed}
+        slug={slug}
+      />
+    );
+  } catch (error) {
+    console.error("Error loading subreddit page:", error);
+    return notFound();
+  }
 }

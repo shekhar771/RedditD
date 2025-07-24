@@ -11,7 +11,7 @@ export const { GET, POST } = createRouteHandler({
 
     // Simplified callback URL - let UploadThing handle the detection
     callbackUrl: process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}/api/uploadthing`
+      ? `https://reddit2-beta.vercel.app/api/uploadthing`
       : `${
           process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
         }/api/uploadthing`,
@@ -20,6 +20,7 @@ export const { GET, POST } = createRouteHandler({
     corsOrigins: [
       'http://localhost:3000',
       'https://*.app.github.dev',
+      'https://reddit2-beta.vercel.app/',
       'https://potential-zebra-vrp6r4p4x4whpp65-3000.app.github.dev',
       ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
       ...(process.env.NEXT_PUBLIC_SUPABASE_URL

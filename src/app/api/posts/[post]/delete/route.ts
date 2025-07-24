@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { withAuth } from '@/lib/server-auth'
 import { prisma } from '@/lib/db'
+const CACHE_DURATION = 300; // 5 minutes
 
 export const DELETE = withAuth(async (req: NextRequest, user) => {
   try {

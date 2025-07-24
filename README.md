@@ -1,31 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Reddit Clone - Full Stack Application
 
-## Getting Started
+![Project Screenshot](/screenshot.png) <!-- Add your screenshot path here -->
 
-First, run the development server:
+A feature-rich Reddit clone built with modern web technologies, implementing core social media functionalities with custom authentication.
 
-```bash
-npm run dev
+## 🔥 Features
 
-```
+- **Authentication System**
+  - Custom implementation using Lucia Auth
+  - Multiple login methods: Google, GitHub, Email/Password
+  - Session-based authentication with secure cookies
+  - Protected routes and role-based access
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Core Functionalities**
+  - Create, view, and interact with posts (Text/Image/Link)
+  - Vote (upvote/downvote) system
+  - Nested comment threads
+  - Subreddit communities with subscription model
+  - Post sorting (Hot, New, Top, Controversial)
+  - Post filtering by type (Text, Image, Link)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Performance Optimized**
+  - Database query optimization
+  - Infinite scroll with React Query
+  - Optimistic UI updates
+  - Server-side rendering for critical pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 Tech Stack
 
-## Learn More
+**Frontend:**
+- Next.js 14 (App Router)
+- TypeScript
+- shadcn/ui (Radix + Tailwind CSS)
+- React Query (Data fetching)
+- Zod (Validation)
 
-To learn more about Next.js, take a look at the following resources:
+**Backend:**
+- Next.js API Routes
+- PostgreSQL (Database)
+- Prisma (ORM)
+-  (Authentication)
+- OAuth integrations (Google, GitHub)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Infrastructure:**
+- Vercel (Hosting)
+- Supabase (PostgreSQL hosting)
+- Cloudinary (Image storage - if used)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
+### Prerequisites
+- Node.js 18+
+- PostgreSQL database
+- Google/GitHub OAuth credentials
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Installation
+1. Clone the repository
+2. npm run dev
